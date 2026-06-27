@@ -1,193 +1,1001 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-  <base target="_top">
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎓 UNICA - Nền Tảng Học Tập Trực Tuyến</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-    body { font-family: 'Inter', sans-serif; background: #f8fafc; }
-    .sidebar { width: 280px; background: #ffffff; border-right: 1px solid #e2e8f0; min-height: 100vh; position: fixed; left: 0; top: 0; transition: 0.3s; transform: translateX(-280px); z-index: 50; }
-    .sidebar.open { transform: translateX(0); }
-    .nav-item { @apply flex items-center gap-3 px-6 py-4 w-full text-left transition-all font-semibold text-slate-600 hover:bg-indigo-50 hover:text-indigo-600; }
-    .nav-item.active { @apply bg-indigo-600 text-white hover:bg-indigo-700; }
-    .main-content { transition: 0.3s; padding: 2rem; margin-left: 0; }
-    .main-content.shifted { margin-left: 280px; }
-    table { @apply w-full text-left border-collapse; }
-    th { @apply p-4 bg-slate-50 text-slate-500 font-bold text-xs uppercase border-b; }
-    td { @apply p-4 border-b text-sm; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #667eea;
+      --primary-dark: #5568d3;
+      --secondary: #764ba2;
+      --accent: #f093fb;
+      --success: #4caf50;
+      --danger: #e74c3c;
+      --warning: #ff9800;
+      --dark: #1a1a2e;
+      --light: #f5f7fa;
+      --border: #e0e0e0;
+      --shadow: 0 10px 40px rgba(0,0,0,0.1);
+      --shadow-lg: 0 20px 60px rgba(0,0,0,0.15);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: var(--dark);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ============ HEADER ============ */
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 15px 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: var(--shadow);
+    }
+
+    .header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .logo i {
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .nav-menu {
+      display: flex;
+      gap: 30px;
+      list-style: none;
+    }
+
+    .nav-menu a {
+      color: white;
+      text-decoration: none;
+      cursor: pointer;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .nav-menu a:hover {
+      opacity: 0.8;
+    }
+
+    .user-menu {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .balance-display {
+      background: rgba(255,255,255,0.15);
+      padding: 10px 18px;
+      border-radius: 25px;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--primary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--light);
+      transform: translateY(-2px);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+      color: white;
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+      color: white;
+    }
+
+    /* ============ CONTAINER ============ */
+    .container {
+      max-width: 1400px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .section {
+      display: none;
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============ HERO ============ */
+    .hero {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+      color: white;
+      padding: 100px 40px;
+      text-align: center;
+      border-radius: 20px;
+      margin-bottom: 50px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .hero h1 {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+
+    .hero p {
+      font-size: 20px;
+      margin-bottom: 30px;
+    }
+
+    /* ============ GRID ============ */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 30px;
+      margin-bottom: 50px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: all 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .card-image {
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 60px;
+    }
+
+    .card-content {
+      padding: 25px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--dark);
+    }
+
+    .card-text {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 15px;
+    }
+
+    .card-price {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--primary);
+      margin-bottom: 15px;
+    }
+
+    .card-btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    /* ============ MODAL ============ */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.6);
+      overflow-y: auto;
+    }
+
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      animation: slideUp 0.3s ease-out;
+      margin: 20px 0;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-header {
+      font-size: 26px;
+      font-weight: 900;
+      margin-bottom: 25px;
+      color: var(--dark);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 28px;
+      cursor: pointer;
+      color: #999;
+      background: none;
+      border: none;
+    }
+
+    .modal-close:hover {
+      color: var(--danger);
+    }
+
+    /* ============ FORM ============ */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    /* ============ ALERT ============ */
+    .alert {
+      padding: 16px 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .alert.active {
+      display: flex;
+    }
+
+    .alert-success {
+      background: rgba(76, 175, 80, 0.1);
+      color: #2e7d32;
+      border-left: 4px solid #4caf50;
+    }
+
+    .alert-error {
+      background: rgba(231, 76, 60, 0.1);
+      color: #c62828;
+      border-left: 4px solid #e74c3c;
+    }
+
+    .alert-info {
+      background: rgba(102, 126, 234, 0.1);
+      color: #1565c0;
+      border-left: 4px solid #667eea;
+    }
+
+    /* ============ TABLE ============ */
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    thead {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+    }
+
+    th {
+      padding: 16px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    tbody tr:hover {
+      background: var(--light);
+    }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 768px) {
+      .nav-menu {
+        display: none;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding: 50px 20px;
+      }
+
+      .hero h1 {
+        font-size: 32px;
+      }
+
+      .modal-content {
+        width: 95%;
+      }
+    }
   </style>
 </head>
 <body>
 
-  <nav class="sticky top-0 z-40 bg-white border-b px-6 py-4 flex justify-between items-center shadow-sm">
-    <div class="flex items-center gap-4">
-      <button id="menu-btn" onclick="toggleSidebar()" class="p-2 hover:bg-slate-100 rounded-xl hidden">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-width="2" stroke-linecap="round"/></svg>
+<!-- ============ HEADER ============ -->
+<header>
+  <div class="header-container">
+    <div class="logo" onclick="showSection('home')">
+      <i class="fas fa-graduation-cap"></i> UNICA
+    </div>
+    <ul class="nav-menu">
+      <li><a onclick="showSection('home')"><i class="fas fa-home"></i> Trang Chủ</a></li>
+      <li><a onclick="showSection('courses')"><i class="fas fa-book"></i> Khóa Học</a></li>
+      <li><a onclick="showSection('my-courses')"><i class="fas fa-graduation-cap"></i> Khóa Của Tôi</a></li>
+      <li><a onclick="showSection('admin')"><i class="fas fa-cog"></i> Admin</a></li>
+    </ul>
+    <div class="user-menu">
+      <div class="balance-display">
+        <i class="fas fa-coins"></i> <span id="balance">0</span> Xu
+      </div>
+      <button class="btn btn-secondary" onclick="showModal('deposit-modal')">
+        <i class="fas fa-plus-circle"></i> Nạp Xu
       </button>
-      <h1 class="text-2xl font-black text-indigo-600">TONY ACADEMY</h1>
+      <button class="btn btn-secondary" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> Đăng Xuất
+      </button>
     </div>
-    <div id="auth-area" class="flex gap-4">
-      <button onclick="openLogin()" class="font-bold text-slate-600 px-4">Đăng nhập</button>
-      <button onclick="openRegister()" class="bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold">Đăng ký</button>
+  </div>
+</header>
+
+<!-- ============ MAIN CONTENT ============ -->
+<div class="container">
+  <div id="alert" class="alert"></div>
+
+  <!-- HOME -->
+  <div id="home" class="section active">
+    <div class="hero">
+      <h1><i class="fas fa-rocket"></i> Chào Mừng Đến UNICA</h1>
+      <p>Nền tảng học tập trực tuyến hàng đầu Việt Nam</p>
+      <button class="btn btn-secondary" onclick="showSection('courses')">
+        <i class="fas fa-arrow-right"></i> Khám Phá Khóa Học
+      </button>
     </div>
-  </nav>
-
-  <div class="flex">
-    <aside id="sidebar" class="sidebar">
-      <div class="p-8 border-b border-slate-100">
-        <p id="side-uid" class="text-[10px] font-bold text-indigo-500 uppercase mb-1">UID: ---</p>
-        <p id="side-name" class="font-bold text-slate-900 text-lg truncate">Học viên</p>
-        <p id="side-role" class="text-xs text-slate-500">Học viên chính thức</p>
-      </div>
-      <div class="flex flex-col mt-4">
-        <button class="nav-item active" onclick="showView('home', this)">📚 Khám phá khóa học</button>
-        <button class="nav-item" onclick="showView('my-courses', this)">🎓 Khóa học của tôi</button>
-        <button class="nav-item" onclick="showView('wallet', this)">💳 Ví tiền & Nạp xu</button>
-        
-        <div id="admin-links" class="hidden border-t mt-4 pt-4">
-          <p class="px-6 text-[10px] font-bold text-slate-400 uppercase mb-2">Quản trị</p>
-          <button class="nav-item" onclick="showView('admin-courses', this)">🛠 Khóa học</button>
-          <button class="nav-item" onclick="showView('admin-users', this)">👥 Người dùng</button>
-          <button class="nav-item" onclick="showView('admin-orders', this)">💰 Đơn hàng</button>
-        </div>
-        <button class="nav-item text-red-500 mt-10" onclick="logout()">🚪 Đăng xuất</button>
-      </div>
-    </aside>
-
-    <main id="main-content" class="main-content flex-1">
-      <div id="view-home"><h2 class="text-3xl font-black mb-8">Khóa học nổi bật 🚀</h2><div id="course-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div></div>
-      
-      <div id="view-wallet" class="hidden">
-        <div class="bg-indigo-600 rounded-[2rem] p-10 text-white mb-8 shadow-xl">
-          <p class="opacity-70 text-xs font-bold uppercase">Số dư ví</p>
-          <h2 class="text-6xl font-black mt-2"><span id="user-coins">0</span> Xu</h2>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div onclick="recharge(100000, 100000)" class="bg-white p-8 rounded-3xl border-2 border-transparent hover:border-indigo-600 cursor-pointer text-center shadow-sm transition-all">
-            <b class="text-2xl text-indigo-600">100.000 Xu</b><p class="text-slate-500 mt-2">100.000đ</p>
-          </div>
-          <div onclick="recharge(200000, 220000)" class="bg-white p-8 rounded-3xl border-2 border-transparent hover:border-indigo-600 cursor-pointer text-center shadow-sm transition-all">
-            <b class="text-2xl text-indigo-600">220.000 Xu</b><p class="text-slate-500 mt-2">200.000đ</p>
-          </div>
-          <div onclick="recharge(500000, 550000)" class="bg-white p-8 rounded-3xl border-2 border-transparent hover:border-indigo-600 cursor-pointer text-center shadow-sm transition-all">
-            <b class="text-2xl text-indigo-600">550.000 Xu</b><p class="text-slate-500 mt-2">500.000đ</p>
-          </div>
-        </div>
-      </div>
-
-      <div id="view-my-courses" class="hidden"><h2 class="text-3xl font-black mb-8">Khóa học của tôi</h2><div id="my-course-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div></div>
-
-      <div id="view-admin-courses" class="hidden"><h2 class="text-3xl font-black mb-8">Quản lý Khóa học</h2><div class="bg-white p-6 rounded-2xl shadow-sm"><table id="table-courses"></table></div></div>
-      <div id="view-admin-users" class="hidden"><h2 class="text-3xl font-black mb-8">Quản lý Người dùng</h2><div class="bg-white p-6 rounded-2xl shadow-sm"><table id="table-users"></table></div></div>
-      <div id="view-admin-orders" class="hidden"><h2 class="text-3xl font-black mb-8">Duyệt đơn hàng</h2><div class="bg-white p-6 rounded-2xl shadow-sm"><table id="table-orders"></table></div></div>
-    </main>
   </div>
 
-  <script>
-    let user = null; let allCourses = [];
+  <!-- COURSES -->
+  <div id="courses" class="section">
+    <h2 style="color: white; margin-bottom: 30px;">📚 Tất Cả Khóa Học</h2>
+    <div id="courses-grid" class="grid"></div>
+  </div>
 
-    window.onload = () => {
-      loadCourses();
-      const saved = JSON.parse(localStorage.getItem('tony_user'));
-      if(saved) google.script.run.withSuccessHandler(res => { if(res) { user = res; applyUserUI(); } }).getUserData(saved.email);
-    };
+  <!-- MY COURSES -->
+  <div id="my-courses" class="section">
+    <h2 style="color: white; margin-bottom: 30px;">📖 Khóa Học Của Tôi</h2>
+    <div id="my-courses-grid" class="grid"></div>
+  </div>
 
-    function loadCourses() {
-      google.script.run.withSuccessHandler(data => { allCourses = data; renderCourses(); }).getCourses();
-    }
+  <!-- ADMIN -->
+  <div id="admin" class="section">
+    <div style="background: white; padding: 30px; border-radius: 15px;">
+      <h2 style="margin-bottom: 20px;">⚙️ Bảng Điều Khiển Admin</h2>
+      
+      <div style="display: flex; gap: 10px; margin-bottom: 30px; border-bottom: 2px solid var(--border); padding-bottom: 20px;">
+        <button class="tab-btn active" onclick="switchAdminTab('courses-admin')">
+          <i class="fas fa-book"></i> Khóa Học
+        </button>
+        <button class="tab-btn" onclick="switchAdminTab('users-admin')">
+          <i class="fas fa-users"></i> Người Dùng
+        </button>
+        <button class="tab-btn" onclick="switchAdminTab('orders-admin')">
+          <i class="fas fa-shopping-cart"></i> Đơn Hàng
+        </button>
+      </div>
 
-    function applyUserUI() {
-      if(!user) return;
-      document.getElementById('auth-area').innerHTML = `<button onclick="viewProfile()" class="font-bold text-indigo-600 bg-indigo-50 px-4 py-2 rounded-xl border border-indigo-100">👤 ${user.name}</button>`;
-      document.getElementById('sidebar').classList.add('open');
-      document.getElementById('main-content').classList.add('shifted');
-      document.getElementById('menu-btn').classList.remove('hidden');
-      document.getElementById('side-uid').innerText = "UID: " + user.uid;
-      document.getElementById('side-name').innerText = user.name;
-      document.getElementById('side-role').innerText = user.role;
-      document.getElementById('user-coins').innerText = user.coins.toLocaleString();
-      if(user.role === 'Quản trị viên') document.getElementById('admin-links').classList.remove('hidden');
-    }
-
-    function renderCourses() {
-      const grid = document.getElementById('course-grid');
-      grid.innerHTML = allCourses.map(c => `
-        <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden hover:shadow-xl transition-all flex flex-col">
-          <img src="${c.ThumbnailURL}" class="h-48 w-full object-cover">
-          <div class="p-6 flex flex-col flex-1">
-            <h3 class="font-bold text-lg text-slate-800 mb-2 h-14 overflow-hidden">${c.Title}</h3>
-            <p class="text-indigo-600 font-black text-2xl mb-6">${Number(c.Price).toLocaleString()} Xu</p>
-            <div class="flex gap-2 mt-auto">
-              <button onclick="previewCourse('${c.ID}')" class="flex-1 bg-slate-100 py-3 rounded-2xl font-bold text-sm">Học thử</button>
-              <button onclick="unlockCourse('${c.ID}', ${c.Price})" class="flex-1 bg-indigo-600 text-white py-3 rounded-2xl font-bold text-sm">Mở khóa</button>
-            </div>
-          </div>
+      <div id="courses-admin" class="tab-content active">
+        <button class="btn btn-primary" onclick="showModal('add-course-modal')" style="margin-bottom: 20px;">
+          <i class="fas fa-plus"></i> Thêm Khóa Học
+        </button>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Tên Khóa</th>
+                <th>Giá (Xu)</th>
+                <th>Giảng Viên</th>
+                <th>Hành Động</th>
+              </tr>
+            </thead>
+            <tbody id="courses-table-body"></tbody>
+          </table>
         </div>
-      `).join('');
+      </div>
+
+      <div id="users-admin" class="tab-content" style="display: none;">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Tên</th>
+                <th>Số Dư (Xu)</th>
+              </tr>
+            </thead>
+            <tbody id="users-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="orders-admin" class="tab-content" style="display: none;">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>ID Đơn</th>
+                <th>User</th>
+                <th>Khóa</th>
+                <th>Số Tiền</th>
+              </tr>
+            </thead>
+            <tbody id="orders-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODALS ============ -->
+
+<!-- Login Modal -->
+<div id="login-modal" class="modal active">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('login-modal')"><i class="fas fa-times"></i></button>
+    <div class="modal-header"><i class="fas fa-sign-in-alt"></i> Đăng Nhập</div>
+    
+    <form onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label>Email:</label>
+        <input type="email" id="login-email" placeholder="Nhập email" required>
+      </div>
+      <div class="form-group">
+        <label>Mật Khẩu:</label>
+        <input type="password" id="login-password" placeholder="Nhập mật khẩu" required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width: 100%;">
+        <i class="fas fa-arrow-right"></i> Đăng Nhập
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 20px; color: #666;">
+      <p>Chưa có tài khoản? 
+        <a onclick="switchModal('login-modal', 'register-modal')" style="color: var(--primary); cursor: pointer; font-weight: 600;">Đăng Ký</a>
+      </p>
+      <hr style="margin: 15px 0; border: none; border-top: 1px solid var(--border);">
+      <p style="font-size: 12px;">
+        <strong>Demo:</strong><br>
+        user@demo.com / Demo@123
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Register Modal -->
+<div id="register-modal" class="modal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('register-modal')"><i class="fas fa-times"></i></button>
+    <div class="modal-header"><i class="fas fa-user-plus"></i> Đăng Ký</div>
+    
+    <form onsubmit="handleRegister(event)">
+      <div class="form-group">
+        <label>Email:</label>
+        <input type="email" id="register-email" placeholder="Nhập email" required>
+      </div>
+      <div class="form-group">
+        <label>Mật Khẩu:</label>
+        <input type="password" id="register-password" placeholder="Nhập mật khẩu" required minlength="8">
+      </div>
+      <div class="form-group">
+        <label>Tên Đầy Đủ:</label>
+        <input type="text" id="register-fullname" placeholder="Nhập tên" required>
+      </div>
+      <div class="form-group">
+        <label>Số Điện Thoại:</label>
+        <input type="tel" id="register-phone" placeholder="Nhập số điện thoại" required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width: 100%;">
+        <i class="fas fa-arrow-right"></i> Đăng Ký
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Deposit Modal -->
+<div id="deposit-modal" class="modal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('deposit-modal')"><i class="fas fa-times"></i></button>
+    <div class="modal-header"><i class="fas fa-coins"></i> Nạp Xu</div>
+    
+    <form onsubmit="handleDeposit(event)">
+      <div class="form-group">
+        <label>Số Xu:</label>
+        <input type="number" id="deposit-amount" min="10000" step="10000" placeholder="Nhập số xu" required>
+      </div>
+      <button type="submit" class="btn btn-success" style="width: 100%;">
+        <i class="fas fa-check"></i> Nạp Xu
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Add Course Modal -->
+<div id="add-course-modal" class="modal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('add-course-modal')"><i class="fas fa-times"></i></button>
+    <div class="modal-header"><i class="fas fa-plus-circle"></i> Thêm Khóa Học</div>
+    
+    <form onsubmit="handleAddCourse(event)">
+      <div class="form-group">
+        <label>Tên Khóa Học:</label>
+        <input type="text" id="course-name" placeholder="Nhập tên" required>
+      </div>
+      <div class="form-group">
+        <label>Mô Tả:</label>
+        <textarea id="course-description" placeholder="Nhập mô tả" required></textarea>
+      </div>
+      <div class="form-group">
+        <label>Giá (Xu):</label>
+        <input type="number" id="course-price" min="0" placeholder="Nhập giá" required>
+      </div>
+      <div class="form-group">
+        <label>Giảng Viên:</label>
+        <input type="text" id="course-instructor" placeholder="Nhập tên giảng viên" required>
+      </div>
+      <div class="form-group">
+        <label>Danh Mục:</label>
+        <select id="course-category" required>
+          <option value="">-- Chọn --</option>
+          <option value="Web">Web Development</option>
+          <option value="Mobile">Mobile Development</option>
+          <option value="Data">Data Science</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width: 100%;">
+        <i class="fas fa-save"></i> Thêm
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // ⚠️ THAY ĐỔI DÒNG NÀY BẰNG DEPLOYMENT ID CỦA BẠN
+  const API_URL = "https://script.google.com/macros/d/YOUR_DEPLOYMENT_ID/useweb?action=";
+  
+  let currentUser = null;
+  let allCourses = [];
+
+  // ============ INITIALIZATION ============
+  window.addEventListener('load', () => {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      currentUser = JSON.parse(savedUser);
+      closeModal('login-modal');
+      updateUI();
+      loadCourses();
     }
+  });
 
-    function showView(v, el) {
-      if(el) { document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); }
-      ['home', 'wallet', 'my-courses', 'admin-courses', 'admin-users', 'admin-orders'].forEach(x => document.getElementById('view-'+x).classList.toggle('hidden', v !== x));
-      if(v.startsWith('admin')) loadAdminData();
+  // ============ API CALLS ============
+  async function apiCall(action, data = {}) {
+    try {
+      const response = await fetch(API_URL + action, {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('API Error:', error);
+      showAlert('❌ Lỗi kết nối!', 'error');
+      return null;
     }
+  }
 
-    function loadAdminData() {
-      google.script.run.withSuccessHandler(data => {
-        document.getElementById('table-courses').innerHTML = `<tr><th>ID</th><th>Tên</th><th>Giá</th></tr>` + data.courses.slice(1).map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[3]}</td></tr>`).join('');
-        document.getElementById('table-users').innerHTML = `<tr><th>UID</th><th>Tên</th><th>Email</th><th>Xu</th></tr>` + data.users.slice(1).map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[7]}</td></tr>`).join('');
-        document.getElementById('table-orders').innerHTML = `<tr><th>Mã đơn</th><th>Email</th><th>Số tiền</th><th>Trạng thái</th><th>Hành động</th></tr>` + 
-          data.orders.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[4]==='Pending'?`<button onclick="approve('${r[0]}')" class="text-indigo-600 font-bold">Duyệt</button>`:''}</td></tr>`).join('');
-      }).getAdminData();
+  // ============ AUTH ============
+  async function handleLogin(event) {
+    event.preventDefault();
+    
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    
+    const result = await apiCall('loginUser', { email, password });
+    
+    if (result && result.success) {
+      currentUser = result;
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      closeModal('login-modal');
+      updateUI();
+      loadCourses();
+      showAlert('✅ Đăng nhập thành công!', 'success');
+    } else {
+      showAlert('❌ Email hoặc mật khẩu không đúng!', 'error');
     }
+  }
 
-    function approve(id) { google.script.run.withSuccessHandler(() => { Swal.fire("Đã duyệt!"); loadAdminData(); }).approveOrder(id); }
+  async function handleRegister(event) {
+    event.preventDefault();
+    
+    const email = document.getElementById('register-email').value;
+    const password = document.getElementById('register-password').value;
+    const fullName = document.getElementById('register-fullname').value;
+    const phone = document.getElementById('register-phone').value;
+    
+    const result = await apiCall('registerUser', { email, password, full_name: fullName, phone });
+    
+    if (result && result.success) {
+      showAlert('✅ Đăng ký thành công!', 'success');
+      switchModal('register-modal', 'login-modal');
+    } else {
+      showAlert('❌ Đăng ký thất bại!', 'error');
+    }
+  }
 
-    function openLogin() {
-      Swal.fire({
-        title: 'Đăng nhập',
-        html: `<input id="l-e" class="swal2-input" placeholder="Email"><input id="l-p" type="password" class="swal2-input" placeholder="Mật khẩu">`,
-        preConfirm: () => ({ e: document.getElementById('l-e').value, p: document.getElementById('l-p').value })
-      }).then(r => {
-        if(r.isConfirmed) google.script.run.withSuccessHandler(res => {
-          if(res.success) { localStorage.setItem('tony_user', JSON.stringify(res.user)); location.reload(); }
-          else Swal.fire("Lỗi", "Sai thông tin", "error");
-        }).loginUser(r.value.e, r.value.p);
+  function logout() {
+    if (confirm('Đăng xuất?')) {
+      currentUser = null;
+      localStorage.removeItem('currentUser');
+      showModal('login-modal');
+      showAlert('✅ Đã đăng xuất!', 'info');
+    }
+  }
+
+  // ============ COURSES ============
+  async function loadCourses() {
+    const result = await apiCall('getCourses');
+    if (result && Array.isArray(result)) {
+      allCourses = result;
+      displayCourses(result);
+    }
+  }
+
+  function displayCourses(courses) {
+    const grid = document.getElementById('courses-grid');
+    grid.innerHTML = '';
+    
+    courses.forEach(course => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="card-image">📚</div>
+        <div class="card-content">
+          <div class="card-title">${course.name}</div>
+          <div class="card-text">👨‍🏫 ${course.instructor}</div>
+          <div class="card-text">${course.description.substring(0, 60)}...</div>
+          <div class="card-price">${course.price.toLocaleString()} Xu</div>
+          <button class="card-btn" onclick="enrollCourse('${course.course_id}', ${course.price})">
+            Mua Khóa Học
+          </button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  async function enrollCourse(courseId, price) {
+    if (!currentUser) {
+      showAlert('❌ Vui lòng đăng nhập!', 'error');
+      return;
+    }
+    
+    if (currentUser.balance < price) {
+      showAlert('❌ Số dư không đủ!', 'error');
+      return;
+    }
+    
+    const result = await apiCall('createOrder', {
+      user_id: currentUser.user_id,
+      course_id: courseId,
+      amount: price
+    });
+    
+    if (result && result.success) {
+      currentUser.balance = result.new_balance;
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      updateUI();
+      showAlert('✅ Mua khóa học thành công!', 'success');
+    } else {
+      showAlert('❌ Mua khóa học thất bại!', 'error');
+    }
+  }
+
+  // ============ DEPOSIT ============
+  async function handleDeposit(event) {
+    event.preventDefault();
+    
+    const amount = parseInt(document.getElementById('deposit-amount').value);
+    
+    const result = await apiCall('depositXu', {
+      user_id: currentUser.user_id,
+      amount: amount
+    });
+    
+    if (result && result.success) {
+      currentUser.balance = result.new_balance;
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      updateUI();
+      closeModal('deposit-modal');
+      showAlert('✅ Nạp xu thành công!', 'success');
+      document.getElementById('deposit-amount').value = '';
+    }
+  }
+
+  // ============ ADMIN ============
+  async function handleAddCourse(event) {
+    event.preventDefault();
+    
+    const data = {
+      name: document.getElementById('course-name').value,
+      description: document.getElementById('course-description').value,
+      price: parseInt(document.getElementById('course-price').value),
+      instructor: document.getElementById('course-instructor').value,
+      category: document.getElementById('course-category').value
+    };
+    
+    const result = await apiCall('addCourse', data);
+    
+    if (result && result.success) {
+      closeModal('add-course-modal');
+      showAlert('✅ Thêm khóa học thành công!', 'success');
+      loadCourses();
+      loadAdminCourses();
+      event.target.reset();
+    }
+  }
+
+  async function loadAdminCourses() {
+    const result = await apiCall('getCourses');
+    if (result && Array.isArray(result)) {
+      const tbody = document.getElementById('courses-table-body');
+      tbody.innerHTML = '';
+      
+      result.forEach(course => {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+          <td>${course.course_id}</td>
+          <td>${course.name}</td>
+          <td>${course.price.toLocaleString()}</td>
+          <td>${course.instructor}</td>
+          <td>
+            <button class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="deleteCourseAdmin('${course.course_id}')">Xóa</button>
+          </td>
+        `;
       });
     }
+  }
 
-    function previewCourse(id) {
-      google.script.run.withSuccessHandler(lessons => {
-        let html = lessons.map((l, i) => `<div class="flex justify-between p-4 bg-slate-50 rounded-xl mb-2 border border-slate-100"><span class="font-semibold text-sm">${i+1}. ${l.title}</span>${i < 2 ? `<button onclick="playVideo('${l.url}')" class="text-indigo-600 font-bold text-sm">XEM THỬ</button>` : '🔒'}</div>`).join('');
-        Swal.fire({ title: "Bài giảng", html: `<div id="v-player"></div><div class="text-left mt-4 max-h-60 overflow-y-auto">${html}</div>`, width: '700px', showConfirmButton: false });
-      }).getLessons(id);
+  async function deleteCourseAdmin(courseId) {
+    if (confirm('Xóa khóa học này?')) {
+      const result = await apiCall('deleteCourse', { course_id: courseId });
+      if (result && result.success) {
+        showAlert('✅ Xóa thành công!', 'success');
+        loadAdminCourses();
+        loadCourses();
+      }
     }
+  }
 
-    function playVideo(url) {
-      const id = url.split('v=')[1] || url.split('/').pop();
-      document.getElementById('v-player').innerHTML = `<iframe class="w-full h-72 rounded-2xl shadow-lg" src="https://www.youtube.com/embed/${id}?autoplay=1" frameborder="0" allowfullscreen></iframe>`;
+  // ============ UI ============
+  function updateUI() {
+    if (currentUser) {
+      document.getElementById('balance').textContent = currentUser.balance.toLocaleString();
     }
+  }
 
-    function recharge(amount, coins) {
-      google.script.run.withSuccessHandler(res => {
-        const qr = `https://img.vietqr.io/image/BVB-99Z0906910910-compact2.jpg?amount=${amount}&addInfo=${res.orderId}&accountName=LE%20THANH%20HOANG`;
-        Swal.fire({ title: 'Nạp xu', html: `<p class="mb-2 font-bold text-indigo-600">Mã đơn: ${res.orderId}</p><img src="${qr}" class="mx-auto w-64 shadow-md rounded-lg">`, confirmButtonText: 'Đã chuyển khoản' });
-      }).createCoinOrder(user.email, amount, coins);
+  function showSection(sectionId) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(sectionId).classList.add('active');
+    
+    if (sectionId === 'courses') loadCourses();
+    if (sectionId === 'admin') {
+      loadAdminCourses();
+      loadAdminUsers();
+      loadAdminOrders();
     }
+  }
 
-    function unlockCourse(id, price) {
-      if(!user) return openLogin();
-      Swal.fire({ title: 'Xác nhận mua', text: `Dùng ${price.toLocaleString()} Xu để mở khóa?`, icon: 'question', showCancelButton: true }).then(r => {
-        if(r.isConfirmed) google.script.run.withSuccessHandler(res => {
-          if(res.success) Swal.fire("Thành công!", "Khóa học đã mở.", "success").then(() => location.reload());
-          else Swal.fire("Thất bại", res.msg, "error");
-        }).buyCourse(user.email, id, price);
+  function showModal(modalId) {
+    document.getElementById(modalId).classList.add('active');
+  }
+
+  function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+  }
+
+  function switchModal(closeId, openId) {
+    closeModal(closeId);
+    showModal(openId);
+  }
+
+  function switchAdminTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+    document.getElementById(tabId).style.display = 'block';
+  }
+
+  function showAlert(message, type = 'info') {
+    const alert = document.getElementById('alert');
+    alert.textContent = message;
+    alert.className = `alert active alert-${type}`;
+    
+    setTimeout(() => {
+      alert.classList.remove('active');
+    }, 3000);
+  }
+
+  async function loadAdminUsers() {
+    const result = await apiCall('getAllUsers');
+    if (result && Array.isArray(result)) {
+      const tbody = document.getElementById('users-table-body');
+      tbody.innerHTML = '';
+      
+      result.forEach(user => {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+          <td>${user.user_id}</td>
+          <td>${user.email}</td>
+          <td>${user.full_name}</td>
+          <td>${user.balance.toLocaleString()}</td>
+        `;
       });
     }
+  }
 
-    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('main-content').classList.toggle('shifted'); }
-    function logout() { localStorage.removeItem('tony_user'); location.reload(); }
-  </script>
+  async function loadAdminOrders() {
+    const result = await apiCall('getAllOrders');
+    if (result && Array.isArray(result)) {
+      const tbody = document.getElementById('orders-table-body');
+      tbody.innerHTML = '';
+      
+      result.forEach(order => {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+          <td>${order.order_id}</td>
+          <td>${order.user_id}</td>
+          <td>${order.course_name}</td>
+          <td>${order.final_amount.toLocaleString()}</td>
+        `;
+      });
+    }
+  }
+</script>
+
 </body>
 </html>
