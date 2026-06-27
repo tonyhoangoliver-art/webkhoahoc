@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; background: #f8fafc; }
+    .sidebar { width: 280px; background: #ffffff; border-right: 1px solid #e2e8f0; min-height: 100vh; position: fixed; left: 0; top: 0; transition: 0.3s; transform: translateX(-280px); z-index: 50; }
+    .sidebar.open { transform: translateX(0); }
+    .nav-item { @apply flex items-center gap-3 px-6 py-4 w-full text-left transition-all font-semibold text-slate-600 hover:bg-indigo-50 hover:text-indigo-600; }
+    .nav-item.active { @apply bg-indigo-600 text-white hover:bg-indigo-700; }
+    .main-content { transition: 0.3s; padding: 2rem; margin-left: 0; }
+    .main-content.shifted { margin-left: 280px; }
+    table { @apply w-full text-left border-collapse; }
+    th { @apply p-4 bg-slate-50 text-slate-500 font-bold text-xs uppercase border-b; }
+    td { @apply p-4 border-b text-sm; }
+  </style>
+</head>
+<body>
+
+  <nav class="sticky top-0 z-40 bg-white border-b px-6 py-4 flex justify-between items-center shadow-sm">
+    <div class="flex items-center gap-4">
+      <button id="menu-btn" onclick="toggleSidebar()" class="p-2 hover:bg-slate-100 rounded-xl hidden">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <h1 class="text-2xl font-black text-indigo-600">TONY ACADEMY</h1>
+    </div>
+    <div id="auth-area" class="flex gap-4">
+      <button onclick="openLogin()" class="font-bold text-slate-600 px-4">Đăng nhập</button>
+      <button onclick="openRegister()" class="bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold">Đăng ký</button>
+    </div>
+  </nav>
+
+  <div class="flex">
+    <aside id="sidebar" class="sidebar">
+      <div class="p-8 border-b border-slate-100">
+        <p id="side-uid" class="text-[10px] font-bold text-indigo-500 uppercase mb-1">UID: ---</p>
+        <p id="side-name" class="font-bold text-slate-900 text-lg truncate">Học viên</p>
+        <p id="side-role" class="text-xs text-slate-500">Học viên chính thức</p>
+      </div>
+      <div class="flex flex-col mt-4">
+        <button class="nav-item active" onclick="showView('home', this)">📚 Khám phá khóa học</button>
+        <button class="nav-item" onclick="showView('my-courses', this)">🎓 Khóa học của tôi</button>
+        <button class="nav-item" onclick="showView('wallet', this)">💳 Ví tiền & Nạp xu</button>
+        
+        <div id="admin-links" class="hidden border-t mt-4 pt-4">
+          <p class="px-6 text-[10px] font-bold text-slate-400 uppercase mb-2">Quản trị</p>
+          <button class="nav-item" onclick="showView('admin-courses', this)">🛠 Khóa học</button>
+          <button class="nav-item" onclick="showView('admin-users', this)">👥 Người dùng</button>
+          <button class="nav-item" onclick="showView('admin-orders', this)">💰 Đơn hàng</button>
+        </div>
+        <button class="nav-item text-red-500 mt-10" onclick="logout()">🚪 Đăng xuất</button>
+      </div>
+    </aside>
+
+    <main id="main-content" class="main-content flex-1">
+      <div id="view-home"><h2 class="text-3xl font-black mb-8">Khóa học nổi bật 🚀</h2><div id="course-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div></div>
+      
+      <div id="view-wallet" class="hidden">
+        <div class="bg-indigo-600 rounded-[2rem] p-10 text-white mb-8 shadow-xl">
+          <p class="opacity-70 text-xs font-bold uppercase">Số dư ví</p>
+          <h2 class="text-6xl font-black mt-2"><span id="user-coins">0</span> Xu</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div onclick="recharge(100000, 100000)" class="bg-white p-8 rounded-3xl border-2 border-transparent hover:border-indigo-600 cursor-pointer text-center shadow-sm transition-all">
+            <b class="text-2xl text-indigo-600">100.000 Xu</b><p class="text-slate-500 mt-2">100.000đ</p>
+          </div>
+          <div onclick="recharge(200000, 220000)" class="bg-white p-8 rounded-3xl border-2 border-transparent hover:border-indigo-600 cursor-pointer text-center shadow-sm transition-all">
+            <b class="text-2xl text-indigo-600">220.000 Xu</b><p class="text-slate-500 mt-2">200.000đ</p>
+          </div>
+          <div onclick="recharge(500000, 550000)" class="bg-white p-8 rounded-3xl border-2 border-transparent hover:border-indigo-600 cursor-pointer text-center shadow-sm transition-all">
+            <b class="text-2xl text-indigo-600">550.000 Xu</b><p class="text-slate-500 mt-2">500.000đ</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="view-my-courses" class="hidden"><h2 class="text-3xl font-black mb-8">Khóa học của tôi</h2><div id="my-course-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div></div>
+
+      <div id="view-admin-courses" class="hidden"><h2 class="text-3xl font-black mb-8">Quản lý Khóa học</h2><div class="bg-white p-6 rounded-2xl shadow-sm"><table id="table-courses"></table></div></div>
+      <div id="view-admin-users" class="hidden"><h2 class="text-3xl font-black mb-8">Quản lý Người dùng</h2><div class="bg-white p-6 rounded-2xl shadow-sm"><table id="table-users"></table></div></div>
+      <div id="view-admin-orders" class="hidden"><h2 class="text-3xl font-black mb-8">Duyệt đơn hàng</h2><div class="bg-white p-6 rounded-2xl shadow-sm"><table id="table-orders"></table></div></div>
+    </main>
+  </div>
+
+  <script>
+    let user = null; let allCourses = [];
+
+    window.onload = () => {
+      loadCourses();
+      const saved = JSON.parse(localStorage.getItem('tony_user'));
+      if(saved) google.script.run.withSuccessHandler(res => { if(res) { user = res; applyUserUI(); } }).getUserData(saved.email);
+    };
+
+    function loadCourses() {
+      google.script.run.withSuccessHandler(data => { allCourses = data; renderCourses(); }).getCourses();
+    }
+
+    function applyUserUI() {
+      if(!user) return;
+      document.getElementById('auth-area').innerHTML = `<button onclick="viewProfile()" class="font-bold text-indigo-600 bg-indigo-50 px-4 py-2 rounded-xl border border-indigo-100">👤 ${user.name}</button>`;
+      document.getElementById('sidebar').classList.add('open');
+      document.getElementById('main-content').classList.add('shifted');
+      document.getElementById('menu-btn').classList.remove('hidden');
+      document.getElementById('side-uid').innerText = "UID: " + user.uid;
+      document.getElementById('side-name').innerText = user.name;
+      document.getElementById('side-role').innerText = user.role;
+      document.getElementById('user-coins').innerText = user.coins.toLocaleString();
+      if(user.role === 'Quản trị viên') document.getElementById('admin-links').classList.remove('hidden');
+    }
+
+    function renderCourses() {
+      const grid = document.getElementById('course-grid');
+      grid.innerHTML = allCourses.map(c => `
+        <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden hover:shadow-xl transition-all flex flex-col">
+          <img src="${c.ThumbnailURL}" class="h-48 w-full object-cover">
+          <div class="p-6 flex flex-col flex-1">
+            <h3 class="font-bold text-lg text-slate-800 mb-2 h-14 overflow-hidden">${c.Title}</h3>
+            <p class="text-indigo-600 font-black text-2xl mb-6">${Number(c.Price).toLocaleString()} Xu</p>
+            <div class="flex gap-2 mt-auto">
+              <button onclick="previewCourse('${c.ID}')" class="flex-1 bg-slate-100 py-3 rounded-2xl font-bold text-sm">Học thử</button>
+              <button onclick="unlockCourse('${c.ID}', ${c.Price})" class="flex-1 bg-indigo-600 text-white py-3 rounded-2xl font-bold text-sm">Mở khóa</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function showView(v, el) {
+      if(el) { document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); }
+      ['home', 'wallet', 'my-courses', 'admin-courses', 'admin-users', 'admin-orders'].forEach(x => document.getElementById('view-'+x).classList.toggle('hidden', v !== x));
+      if(v.startsWith('admin')) loadAdminData();
+    }
+
+    function loadAdminData() {
+      google.script.run.withSuccessHandler(data => {
+        document.getElementById('table-courses').innerHTML = `<tr><th>ID</th><th>Tên</th><th>Giá</th></tr>` + data.courses.slice(1).map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[3]}</td></tr>`).join('');
+        document.getElementById('table-users').innerHTML = `<tr><th>UID</th><th>Tên</th><th>Email</th><th>Xu</th></tr>` + data.users.slice(1).map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[7]}</td></tr>`).join('');
+        document.getElementById('table-orders').innerHTML = `<tr><th>Mã đơn</th><th>Email</th><th>Số tiền</th><th>Trạng thái</th><th>Hành động</th></tr>` + 
+          data.orders.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[4]==='Pending'?`<button onclick="approve('${r[0]}')" class="text-indigo-600 font-bold">Duyệt</button>`:''}</td></tr>`).join('');
+      }).getAdminData();
+    }
+
+    function approve(id) { google.script.run.withSuccessHandler(() => { Swal.fire("Đã duyệt!"); loadAdminData(); }).approveOrder(id); }
+
+    function openLogin() {
+      Swal.fire({
+        title: 'Đăng nhập',
+        html: `<input id="l-e" class="swal2-input" placeholder="Email"><input id="l-p" type="password" class="swal2-input" placeholder="Mật khẩu">`,
+        preConfirm: () => ({ e: document.getElementById('l-e').value, p: document.getElementById('l-p').value })
+      }).then(r => {
+        if(r.isConfirmed) google.script.run.withSuccessHandler(res => {
+          if(res.success) { localStorage.setItem('tony_user', JSON.stringify(res.user)); location.reload(); }
+          else Swal.fire("Lỗi", "Sai thông tin", "error");
+        }).loginUser(r.value.e, r.value.p);
+      });
+    }
+
+    function previewCourse(id) {
+      google.script.run.withSuccessHandler(lessons => {
+        let html = lessons.map((l, i) => `<div class="flex justify-between p-4 bg-slate-50 rounded-xl mb-2 border border-slate-100"><span class="font-semibold text-sm">${i+1}. ${l.title}</span>${i < 2 ? `<button onclick="playVideo('${l.url}')" class="text-indigo-600 font-bold text-sm">XEM THỬ</button>` : '🔒'}</div>`).join('');
+        Swal.fire({ title: "Bài giảng", html: `<div id="v-player"></div><div class="text-left mt-4 max-h-60 overflow-y-auto">${html}</div>`, width: '700px', showConfirmButton: false });
+      }).getLessons(id);
+    }
+
+    function playVideo(url) {
+      const id = url.split('v=')[1] || url.split('/').pop();
+      document.getElementById('v-player').innerHTML = `<iframe class="w-full h-72 rounded-2xl shadow-lg" src="https://www.youtube.com/embed/${id}?autoplay=1" frameborder="0" allowfullscreen></iframe>`;
+    }
+
+    function recharge(amount, coins) {
+      google.script.run.withSuccessHandler(res => {
+        const qr = `https://img.vietqr.io/image/BVB-99Z0906910910-compact2.jpg?amount=${amount}&addInfo=${res.orderId}&accountName=LE%20THANH%20HOANG`;
+        Swal.fire({ title: 'Nạp xu', html: `<p class="mb-2 font-bold text-indigo-600">Mã đơn: ${res.orderId}</p><img src="${qr}" class="mx-auto w-64 shadow-md rounded-lg">`, confirmButtonText: 'Đã chuyển khoản' });
+      }).createCoinOrder(user.email, amount, coins);
+    }
+
+    function unlockCourse(id, price) {
+      if(!user) return openLogin();
+      Swal.fire({ title: 'Xác nhận mua', text: `Dùng ${price.toLocaleString()} Xu để mở khóa?`, icon: 'question', showCancelButton: true }).then(r => {
+        if(r.isConfirmed) google.script.run.withSuccessHandler(res => {
+          if(res.success) Swal.fire("Thành công!", "Khóa học đã mở.", "success").then(() => location.reload());
+          else Swal.fire("Thất bại", res.msg, "error");
+        }).buyCourse(user.email, id, price);
+      });
+    }
+
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('main-content').classList.toggle('shifted'); }
+    function logout() { localStorage.removeItem('tony_user'); location.reload(); }
+  </script>
+</body>
+</html>
