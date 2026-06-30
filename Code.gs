@@ -1,866 +1,784 @@
 // ============================================
-// GOOGLE APPS SCRIPT - BACKEND API
-// UNICA - Nền Tảng Học Tập Trực Tuyến
+// JAVASCRIPT - CHẠY TRÊN BROWSER
 // ============================================
 
-const SHEET_ID = "1a2JprTd3C_Cvb0-AP7CQJYg-SXTaizJeOPsj2yGlWYY";
-const ss = SpreadsheetApp.openById(SHEET_ID);
+// ⚠️ THAY ĐỔI URL NÀY BẰNG DEPLOYMENT ID CỦA BẠN
+const API_URL = 'https://script.google.com/macros/d/AKfycbwLCD-FRsNvAASrfffTqSj0uqWCslfuSH7s4McTyb7G6uQkpj043l9e9IpW0WNpZA-bEQ/usercontent';
+
+let currentUser = null;
+let currentAdmin = null;
+let allCategories = [];
+let allCourses = [];
+let allLessons = [];
+let allUsers = [];
+let allPayments = [];
+let allEnrollments = [];
 
 // ============================================
-// 1. QUẢN LÝ KHÓA HỌC (COURSES)
+// 1. KHỞI TẠO KHI LOAD TRANG
 // ============================================
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('Trang đã load');
+  loadCategories();
+  loadCourses();
+  checkLogin();
+});
 
-function addCourse(data) {
-  try {
-    const sheet = ss.getSheetByName("Courses");
-    const courseId = "C" + Date.now();
-    
-    sheet.appendRow([
-      courseId,
-      data.name,
-      data.description,
-      data.price,
-      data.instructor,
-      data.category,
-      data.image_url || 'https://via.placeholder.com/300x200',
-      data.duration_hours || 0,
-      data.level || "Beginner",
-      0,
-      0,
-      "active",
-      new Date(),
-      new Date()
-    ]);
-    
-    return { success: true, course_id: courseId };
-  } catch (error) {
-    return { success: false, error: error.toString() };
+// ============================================
+// 2. KIỂM TRA ĐĂNG NHẬP
+// ============================================
+function checkLogin() {
+  const user = localStorage.getItem('currentUser');
+  const admin = localStorage.getItem('currentAdmin');
+
+  if (user) {
+    currentUser = JSON.parse(user);
+    console.log('Người dùng đã đăng nhập:', currentUser.name);
   }
-}
-
-function getCourses() {
-  try {
-    const sheet = ss.getSheetByName("Courses");
-    const data = sheet.getDataRange().getValues();
-    const headers = data[0];
-    
-    const courses = [];
-    for (let i = 1; i < data.length; i++) {
-      const course = {};
-      headers.forEach((header, index) => {
-        course[header] = data[i][index];
-      });
-      courses.push(course);
-    }
-    
-    return courses;
-  } catch (error) {
-    return [];
-  }
-}
-
-function getCourseById(courseId) {
-  try {
-    const courses = getCourses();
-    return courses.find(c => c.course_id === courseId) || null;
-  } catch (error) {
-    return null;
-  }
-}
-
-function updateCourse(courseId, data) {
-  try {
-    const sheet = ss.getSheetByName("Courses");
-    const data_range = sheet.getDataRange().getValues();
-    
-    for (let i = 1; i < data_range.length; i++) {
-      if (data_range[i][0] === courseId) {
-        sheet.getRange(i + 1, 2, 1, 13).setValues([[
-          data.name,
-          data.description,
-          data.price,
-          data.instructor,
-          data.category,
-          data.image_url,
-          data.duration_hours,
-          data.level,
-          data.total_students,
-          data.rating,
-          data.status,
-          new Date(),
-          new Date()
-        ]]);
-        return { success: true };
-      }
-    }
-    
-    return { success: false, error: "Course not found" };
-  } catch (error) {
-    return { success: false, error: error.toString() };
-  }
-}
-
-function deleteCourse(courseId) {
-  try {
-    const sheet = ss.getSheetByName("Courses");
-    const data_range = sheet.getDataRange().getValues();
-    
-    for (let i = 1; i < data_range.length; i++) {
-      if (data_range[i][0] === courseId) {
-        sheet.deleteRow(i + 1);
-        return { success: true };
-      }
-    }
-    
-    return { success: false, error: "Course not found" };
-  } catch (error) {
-    return { success: false, error: error.toString() };
+  if (admin) {
+    currentAdmin = JSON.parse(admin);
+    console.log('Admin đã đăng nhập');
   }
 }
 
 // ============================================
-// 2. QUẢN LÝ NGƯỜI DÙNG (USERS)
+// 3. LOAD DANH MỤC TỪ API
 // ============================================
-
-function registerUser(email, password, fullName, phone) {
+async function loadCategories() {
   try {
-    const sheet = ss.getSheetByName("Users");
-    const userId = "U" + Date.now();
-    
-    const data = sheet.getDataRange().getValues();
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][1] === email) {
-        return { success: false, error: "Email đã tồn tại" };
-      }
-    }
-    
-    if (password.length < 8) {
-      return { success: false, error: "Mật khẩu phải có ít nhất 8 ký tự" };
-    }
-    
-    const passwordHash = Utilities.computeDigest(
-      Utilities.DigestAlgorithm.SHA_256,
-      password
-    );
-    
-    sheet.appendRow([
-      userId,
-      email,
-      Utilities.base64Encode(passwordHash),
-      fullName,
-      phone,
-      '',
-      0,
-      0,
-      0,
-      'user',
-      'active',
-      new Date(),
-      new Date()
-    ]);
-    
-    return { success: true, user_id: userId };
+    const response = await fetch(`${API_URL}?action=getCategories`);
+    const data = await response.json();
+    allCategories = data;
+    displayCategories(data);
+    console.log('Đã tải danh mục:', data.length);
   } catch (error) {
-    return { success: false, error: error.toString() };
+    console.error('Lỗi tải danh mục:', error);
+    alert('Lỗi kết nối API. Kiểm tra URL deployment.');
   }
 }
 
-function loginUser(email, password) {
+// ============================================
+// 4. HIỂN THỊ DANH MỤC
+// ============================================
+function displayCategories(categories) {
+  const container = document.getElementById('categoriesContainer');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  if (categories.length === 0) {
+    container.innerHTML = '<p>Chưa có danh mục</p>';
+    return;
+  }
+
+  categories.forEach(cat => {
+    const card = document.createElement('div');
+    card.className = 'category-card';
+    card.innerHTML = `
+      <div style="font-size: 3rem;">${cat.icon}</div>
+      <h3>${cat.name}</h3>
+      <p>${cat.description}</p>
+      <button class="btn-primary" onclick="filterCoursesByCategory('${cat.id}')">
+        Xem Khóa Học
+      </button>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// ============================================
+// 5. LOAD KHÓA HỌC TỪ API
+// ============================================
+async function loadCourses(categoryId = null) {
   try {
-    const sheet = ss.getSheetByName("Users");
-    const data = sheet.getDataRange().getValues();
-    
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][1] === email) {
-        const storedHash = data[i][2];
-        const inputHash = Utilities.base64Encode(
-          Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, password)
-        );
-        
-        if (storedHash === inputHash) {
-          sheet.getRange(i + 1, 13).setValue(new Date());
-          
-          return {
-            success: true,
-            user_id: data[i][0],
-            email: data[i][1],
-            full_name: data[i][3],
-            phone: data[i][4],
-            balance: data[i][6],
-            role: data[i][9]
-          };
-        }
-      }
-    }
-    
-    return { success: false, error: "Email hoặc mật khẩu không đúng" };
+    const url = categoryId
+      ? `${API_URL}?action=getCourses&categoryId=${categoryId}`
+      : `${API_URL}?action=getCourses`;
+    const response = await fetch(url);
+    const data = await response.json();
+    allCourses = data;
+    displayCourses(data);
+    console.log('Đã tải khóa học:', data.length);
   } catch (error) {
-    return { success: false, error: error.toString() };
+    console.error('Lỗi tải khóa học:', error);
   }
 }
 
-function getUserBalance(userId) {
-  try {
-    const sheet = ss.getSheetByName("Users");
-    const data = sheet.getDataRange().getValues();
-    
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][0] === userId) {
-        return { balance: data[i][6] };
-      }
-    }
-    
-    return { error: "User not found" };
-  } catch (error) {
-    return { error: error.toString() };
+// ============================================
+// 6. HIỂN THỊ KHÓA HỌC
+// ============================================
+function displayCourses(courses) {
+  const container = document.getElementById('coursesContainer');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  if (courses.length === 0) {
+    container.innerHTML = '<p>Chưa có khóa học</p>';
+    return;
   }
+
+  courses.forEach(course => {
+    const finalPrice = course.price * (1 - course.discount / 100);
+    const card = document.createElement('div');
+    card.className = 'course-card';
+    card.innerHTML = `
+      <img src="${course.image}" alt="${course.name}" 
+           style="width:100%; height:150px; object-fit:cover; border-radius:5px;"
+           onerror="this.src='https://via.placeholder.com/300x200'">
+      <h3>${course.name}</h3>
+      <p>${course.description}</p>
+      <div class="price">
+        ${course.discount > 0 ? `<span style="text-decoration:line-through;">${course.price.toLocaleString()} VND</span><br>` : ''}
+        <strong>${finalPrice.toLocaleString()} VND</strong>
+      </div>
+      <p>👨‍🏫 ${course.teacher}</p>
+      <p>📚 ${course.lessons} bài học</p>
+      <button class="btn-primary" onclick="viewCourseDetail('${course.id}')">
+        Chi Tiết & Đăng Ký
+      </button>
+    `;
+    container.appendChild(card);
+  });
 }
 
-function getUserInfo(userId) {
-  try {
-    const sheet = ss.getSheetByName("Users");
-    const data = sheet.getDataRange().getValues();
-    const headers = data[0];
-    
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][0] === userId) {
-        const user = {};
-        headers.forEach((header, index) => {
-          user[header] = data[i][index];
-        });
-        return user;
-      }
-    }
-    
-    return null;
-  } catch (error) {
-    return null;
-  }
+// ============================================
+// 7. LỌC KHÓA HỌC THEO DANH MỤC
+// ============================================
+function filterCoursesByCategory(categoryId) {
+  const filtered = allCourses.filter(c => c.categoryId === categoryId);
+  displayCourses(filtered);
+  document.getElementById('courses').scrollIntoView({ behavior: 'smooth' });
 }
 
-function getAllUsers() {
+// ============================================
+// 8. XEM CHI TIẾT KHÓA HỌC
+// ============================================
+async function viewCourseDetail(courseId) {
+  const course = allCourses.find(c => c.id === courseId);
+  if (!course) return;
+
+  const modal = document.getElementById('courseModal');
+  const detail = document.getElementById('courseDetail');
+
+  // Load bài học
+  const lessons = await loadLessonsForCourse(courseId);
+
+  const finalPrice = course.price * (1 - course.discount / 100);
+  detail.innerHTML = `
+    <h2>${course.name}</h2>
+    <img src="${course.image}" alt="${course.name}" 
+         style="width:100%; height:300px; object-fit:cover; border-radius:10px; margin:1rem 0;"
+         onerror="this.src='https://via.placeholder.com/300x200'">
+    <p><strong>Mô Tả:</strong> ${course.description}</p>
+    <p><strong>Giáo Viên:</strong> ${course.teacher}</p>
+    <p><strong>Giá:</strong> <span style="color:#ffd700; font-size:1.2rem;">${finalPrice.toLocaleString()} VND</span></p>
+    <p><strong>Số Bài Học:</strong> ${course.lessons}</p>
+    <h3>📖 Danh Sách Bài Học:</h3>
+    <ul style="margin-left:2rem;">
+      ${lessons.length > 0 
+        ? lessons.map(l => `<li><strong>Tuần ${l.week}:</strong> ${l.title} (${l.duration})</li>`).join('')
+        : '<li>Chưa có bài học</li>'
+      }
+    </ul>
+    <button class="btn-primary" onclick="enrollCourse('${course.id}', ${finalPrice})">
+      🛒 Đăng Ký Khóa Học
+    </button>
+  `;
+
+  modal.style.display = 'flex';
+}
+
+// ============================================
+// 9. LOAD BÀI HỌC CHO KHÓA
+// ============================================
+async function loadLessonsForCourse(courseId) {
   try {
-    const sheet = ss.getSheetByName("Users");
-    const data = sheet.getDataRange().getValues();
-    const headers = data[0];
-    
-    const users = [];
-    for (let i = 1; i < data.length; i++) {
-      const user = {};
-      headers.forEach((header, index) => {
-        user[header] = data[i][index];
-      });
-      users.push(user);
-    }
-    
-    return users;
+    const response = await fetch(`${API_URL}?action=getLessons&courseId=${courseId}`);
+    const data = await response.json();
+    return data;
   } catch (error) {
+    console.error('Lỗi tải bài học:', error);
     return [];
   }
 }
 
 // ============================================
-// 3. QUẢN LÝ GIAO DỊCH NẠP XU
+// 10. ĐĂNG KÝ KHÓA HỌC
 // ============================================
+function enrollCourse(courseId, price) {
+  if (!currentUser) {
+    const name = prompt('Nhập tên của bạn:');
+    if (!name) return;
 
-function depositXu(userId, amount) {
-  try {
-    const settings = getSettings();
-    const minDeposit = parseInt(settings.min_deposit) || 10000;
-    const maxDeposit = parseInt(settings.max_deposit) || 10000000;
-    
-    if (amount < minDeposit || amount > maxDeposit) {
-      return { 
-        success: false, 
-        error: `Số tiền phải từ ${minDeposit.toLocaleString()} đến ${maxDeposit.toLocaleString()}` 
-      };
-    }
-    
-    const usersSheet = ss.getSheetByName("Users");
-    const transSheet = ss.getSheetByName("Transactions");
-    const transId = "T" + Date.now();
-    
-    const userData = usersSheet.getDataRange().getValues();
-    
-    for (let i = 1; i < userData.length; i++) {
-      if (userData[i][0] === userId) {
-        const balanceBefore = userData[i][6];
-        const newBalance = balanceBefore + amount;
-        usersSheet.getRange(i + 1, 7).setValue(newBalance);
-        
-        transSheet.appendRow([
-          transId,
-          userId,
-          'deposit',
-          amount,
-          balanceBefore,
-          newBalance,
-          'Nạp xu',
-          'wallet',
-          '',
-          'completed',
-          'Nạp thành công',
-          new Date()
-        ]);
-        
-        return {
-          success: true,
-          transaction_id: transId,
-          new_balance: newBalance
-        };
-      }
-    }
-    
-    return { success: false, error: "User not found" };
-  } catch (error) {
-    return { success: false, error: error.toString() };
-  }
-}
+    const email = prompt('Nhập email của bạn:');
+    if (!email) return;
 
-function getTransactionHistory(userId) {
-  try {
-    const sheet = ss.getSheetByName("Transactions");
-    const data = sheet.getDataRange().getValues();
-    const headers = data[0];
-    
-    const transactions = [];
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][1] === userId) {
-        const trans = {};
-        headers.forEach((header, index) => {
-          trans[header] = data[i][index];
-        });
-        transactions.push(trans);
-      }
-    }
-    
-    return transactions.reverse();
-  } catch (error) {
-    return [];
-  }
-}
+    const phone = prompt('Nhập số điện thoại:');
+    if (!phone) return;
 
-function getAllTransactions() {
-  try {
-    const sheet = ss.getSheetByName("Transactions");
-    const data = sheet.getDataRange().getValues();
-    const headers = data[0];
-    
-    const transactions = [];
-    for (let i = 1; i < data.length; i++) {
-      const trans = {};
-      headers.forEach((header, index) => {
-        trans[header] = data[i][index];
-      });
-      transactions.push(trans);
-    }
-    
-    return transactions.reverse();
-  } catch (error) {
-    return [];
+    // Tạo người dùng mới
+    registerUser(name, email, phone, courseId, price);
+  } else {
+    processPayment(currentUser.id, courseId, price);
   }
 }
 
 // ============================================
-// 4. QUẢN LÝ ĐƠN HÀNG (ORDERS)
+// 11. ĐĂNG KÝ NGƯỜI DÙNG MỚI
 // ============================================
-
-function createOrder(userId, courseId, amount) {
+async function registerUser(name, email, phone, courseId, price) {
   try {
-    const ordersSheet = ss.getSheetByName("Orders");
-    const usersSheet = ss.getSheetByName("Users");
-    const orderId = "O" + Date.now();
-    
-    const userData = usersSheet.getDataRange().getValues();
-    let userBalance = 0;
-    let userRowIndex = -1;
-    
-    for (let i = 1; i < userData.length; i++) {
-      if (userData[i][0] === userId) {
-        userBalance = userData[i][6];
-        userRowIndex = i;
-        break;
-      }
-    }
-    
-    if (userBalance < amount) {
-      return { success: false, error: "Số dư không đủ" };
-    }
-    
-    const newBalance = userBalance - amount;
-    usersSheet.getRange(userRowIndex + 1, 7).setValue(newBalance);
-    
-    const course = getCourseById(courseId);
-    
-    ordersSheet.appendRow([
-      orderId,
-      userId,
-      courseId,
-      course.name,
-      amount,
-      0,
-      amount,
-      'xu',
-      'completed',
-      '',
-      new Date(),
-      new Date()
-    ]);
-    
-    addEnrollment(userId, courseId);
-    
-    return {
-      success: true,
-      order_id: orderId,
-      new_balance: newBalance
-    };
-  } catch (error) {
-    return { success: false, error: error.toString() };
-  }
-}
-
-function getOrders(userId) {
-  try {
-    const sheet = ss.getSheetByName("Orders");
-    const data = sheet.getDataRange().getValues();
-    const headers = data[0];
-    
-    const orders = [];
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][1] === userId) {
-        const order = {};
-        headers.forEach((header, index) => {
-          order[header] = data[i][index];
-        });
-        orders.push(order);
-      }
-    }
-    
-    return orders.reverse();
-  } catch (error) {
-    return [];
-  }
-}
-
-function getAllOrders() {
-  try {
-    const sheet = ss.getSheetByName("Orders");
-    const data = sheet.getDataRange().getValues();
-    const headers = data[0];
-    
-    const orders = [];
-    for (let i = 1; i < data.length; i++) {
-      const order = {};
-      headers.forEach((header, index) => {
-        order[header] = data[i][index];
-      });
-      orders.push(order);
-    }
-    
-    return orders.reverse();
-  } catch (error) {
-    return [];
-  }
-}
-
-// ============================================
-// 5. QUẢN LÝ GIAO DỊCH HỌC (ENROLLMENTS)
-// ============================================
-
-function addEnrollment(userId, courseId) {
-  try {
-    const sheet = ss.getSheetByName("Enrollments");
-    const enrollmentId = "E" + Date.now();
-    
-    const course = getCourseById(courseId);
-    
-    sheet.appendRow([
-      enrollmentId,
-      userId,
-      courseId,
-      course.name,
-      0,
-      0,
-      0,
-      new Date(),
-      'active',
-      '',
-      false,
-      new Date()
-    ]);
-    
-    return { success: true, enrollment_id: enrollmentId };
-  } catch (error) {
-    return { success: false, error: error.toString() };
-  }
-}
-
-function getUserEnrollments(userId) {
-  try {
-    const sheet = ss.getSheetByName("Enrollments");
-    const data = sheet.getDataRange().getValues();
-    const headers = data[0];
-    
-    const enrollments = [];
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][1] === userId) {
-        const enrollment = {};
-        headers.forEach((header, index) => {
-          enrollment[header] = data[i][index];
-        });
-        enrollments.push(enrollment);
-      }
-    }
-    
-    return enrollments;
-  } catch (error) {
-    return [];
-  }
-}
-
-function updateProgress(enrollmentId, progress) {
-  try {
-    const sheet = ss.getSheetByName("Enrollments");
-    const data = sheet.getDataRange().getValues();
-    
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][0] === enrollmentId) {
-        sheet.getRange(i + 1, 5).setValue(progress);
-        
-        if (progress >= 100) {
-          sheet.getRange(i + 1, 9).setValue("completed");
-          sheet.getRange(i + 1, 10).setValue(new Date());
-          sheet.getRange(i + 1, 11).setValue(true);
-        }
-        
-        return { success: true };
-      }
-    }
-    
-    return { success: false, error: "Enrollment not found" };
-  } catch (error) {
-    return { success: false, error: error.toString() };
-  }
-}
-
-function getAllEnrollments() {
-  try {
-    const sheet = ss.getSheetByName("Enrollments");
-    const data = sheet.getDataRange().getValues();
-    const headers = data[0];
-    
-    const enrollments = [];
-    for (let i = 1; i < data.length; i++) {
-      const enrollment = {};
-      headers.forEach((header, index) => {
-        enrollment[header] = data[i][index];
-      });
-      enrollments.push(enrollment);
-    }
-    
-    return enrollments;
-  } catch (error) {
-    return [];
-  }
-}
-
-// ============================================
-// 6. QUẢN LÝ VIDEO KHÓA HỌC
-// ============================================
-
-function getCourseVideos(courseId) {
-  try {
-    const videos = {
-      'C001': [
-        { id: 1, title: 'Giới Thiệu HTML', duration: 15, locked: false },
-        { id: 2, title: 'Cơ Bản CSS', duration: 20, locked: false },
-        { id: 3, title: 'JavaScript Cơ Bản', duration: 25, locked: false },
-        { id: 4, title: 'DOM Manipulation', duration: 30, locked: true },
-        { id: 5, title: 'Event Handling', duration: 28, locked: true },
-        { id: 6, title: 'Async/Await', duration: 35, locked: true }
-      ],
-      'C002': [
-        { id: 1, title: 'React Hooks Cơ Bản', duration: 20, locked: false },
-        { id: 2, title: 'useState Hook', duration: 25, locked: false },
-        { id: 3, title: 'useEffect Hook', duration: 30, locked: false },
-        { id: 4, title: 'Custom Hooks', duration: 35, locked: true },
-        { id: 5, title: 'Redux Integration', duration: 40, locked: true }
-      ],
-      'C003': [
-        { id: 1, title: 'Flutter Setup', duration: 15, locked: false },
-        { id: 2, title: 'Widgets Cơ Bản', duration: 20, locked: false },
-        { id: 3, title: 'Layout & Navigation', duration: 25, locked: false },
-        { id: 4, title: 'State Management', duration: 30, locked: true },
-        { id: 5, title: 'API Integration', duration: 35, locked: true }
-      ],
-      'C004': [
-        { id: 1, title: 'Python Cơ Bản', duration: 20, locked: false },
-        { id: 2, title: 'Pandas & NumPy', duration: 25, locked: false },
-        { id: 3, title: 'Data Visualization', duration: 30, locked: false },
-        { id: 4, title: 'Machine Learning', duration: 40, locked: true },
-        { id: 5, title: 'Model Deployment', duration: 35, locked: true }
-      ],
-      'C005': [
-        { id: 1, title: 'Design Principles', duration: 25, locked: false },
-        { id: 2, title: 'Figma Basics', duration: 30, locked: false },
-        { id: 3, title: 'Prototyping', duration: 28, locked: false },
-        { id: 4, title: 'User Testing', duration: 35, locked: true },
-        { id: 5, title: 'Design Systems', duration: 40, locked: true }
-      ],
-      'C006': [
-        { id: 1, title: 'AI Fundamentals', duration: 30, locked: false },
-        { id: 2, title: 'Neural Networks', duration: 40, locked: false },
-        { id: 3, title: 'Deep Learning', duration: 45, locked: false },
-        { id: 4, title: 'NLP & Computer Vision', duration: 50, locked: true },
-        { id: 5, title: 'Deployment & Ethics', duration: 40, locked: true }
-      ],
-      'C007': [
-        { id: 1, title: 'Node.js Setup', duration: 15, locked: false },
-        { id: 2, title: 'Express Framework', duration: 25, locked: false },
-        { id: 3, title: 'Database Design', duration: 30, locked: false },
-        { id: 4, title: 'Authentication', duration: 35, locked: true },
-        { id: 5, title: 'API Security', duration: 40, locked: true }
-      ],
-      'C008': [
-        { id: 1, title: 'Vue.js Intro', duration: 20, locked: false },
-        { id: 2, title: 'Components & Props', duration: 25, locked: false },
-        { id: 3, title: 'State Management', duration: 30, locked: false },
-        { id: 4, title: 'Vue Router', duration: 35, locked: true },
-        { id: 5, title: 'Deployment', duration: 25, locked: true }
-      ]
-    };
-    
-    return videos[courseId] || [];
-  } catch (error) {
-    return [];
-  }
-}
-
-function checkCourseAccess(userId, courseId) {
-  try {
-    const enrollments = getUserEnrollments(userId);
-    const hasAccess = enrollments.some(e => e.course_id === courseId);
-    return { has_access: hasAccess };
-  } catch (error) {
-    return { has_access: false };
-  }
-}
-
-// ============================================
-// 7. QUẢN LÝ CÀI ĐẶT
-// ============================================
-
-function getSettings() {
-  try {
-    const sheet = ss.getSheetByName("Settings");
-    const data = sheet.getDataRange().getValues();
-    
-    const settings = {};
-    for (let i = 1; i < data.length; i++) {
-      settings[data[i][0]] = data[i][1];
-    }
-    
-    return settings;
-  } catch (error) {
-    return {};
-  }
-}
-
-function updateSetting(key, value) {
-  try {
-    const sheet = ss.getSheetByName("Settings");
-    const data = sheet.getDataRange().getValues();
-    
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][0] === key) {
-        sheet.getRange(i + 1, 2).setValue(value);
-        sheet.getRange(i + 1, 4).setValue(new Date());
-        return { success: true };
-      }
-    }
-    
-    return { success: false, error: "Setting not found" };
-  } catch (error) {
-    return { success: false, error: error.toString() };
-  }
-}
-
-// ============================================
-// 8. THỐNG KÊ & BÁO CÁO
-// ============================================
-
-function getStatistics() {
-  try {
-    const courses = getCourses();
-    const users = getAllUsers();
-    const orders = getAllOrders();
-    const transactions = getAllTransactions();
-    const enrollments = getAllEnrollments();
-    
-    let totalRevenue = 0;
-    let completedOrders = 0;
-    orders.forEach(order => {
-      if (order.status === 'completed') {
-        totalRevenue += order.final_amount || 0;
-        completedOrders++;
-      }
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      payload: JSON.stringify({
+        action: 'addUser',
+        name: name,
+        email: email,
+        phone: phone,
+        address: '',
+        birthDate: ''
+      })
     });
-    
-    let activeUsers = 0;
-    users.forEach(user => {
-      if (user.status === 'active') {
-        activeUsers++;
-      }
-    });
-    
-    let completedCourses = 0;
-    enrollments.forEach(enrollment => {
-      if (enrollment.status === 'completed') {
-        completedCourses++;
-      }
-    });
-    
-    return {
-      total_courses: courses.length,
-      total_users: users.length,
-      active_users: activeUsers,
-      total_orders: orders.length,
-      completed_orders: completedOrders,
-      total_revenue: totalRevenue,
-      total_enrollments: enrollments.length,
-      completed_enrollments: completedCourses,
-      total_transactions: transactions.length
-    };
-  } catch (error) {
-    return { error: error.toString() };
-  }
-}
+    const result = await response.json();
 
-function getDashboardData(userId) {
-  try {
-    const user = getUserInfo(userId);
-    const enrollments = getUserEnrollments(userId);
-    const orders = getOrders(userId);
-    const transactions = getTransactionHistory(userId);
-    
-    return {
-      user: user,
-      enrollments: enrollments,
-      orders: orders,
-      transactions: transactions,
-      stats: {
-        courses_purchased: orders.length,
-        courses_learning: enrollments.filter(e => e.status === 'active').length,
-        courses_completed: enrollments.filter(e => e.status === 'completed').length,
-        total_spent: orders.reduce((sum, o) => sum + (o.final_amount || 0), 0)
-      }
-    };
-  } catch (error) {
-    return { error: error.toString() };
-  }
-}
-
-// ============================================
-// 9. WEB APP ENDPOINT
-// ============================================
-
-function doPost(e) {
-  const action = e.parameter.action;
-  const data = JSON.parse(e.postData.contents);
-  
-  let result = {};
-  
-  try {
-    switch(action) {
-      case "addCourse":
-        result = addCourse(data);
-        break;
-      case "getCourses":
-        result = getCourses();
-        break;
-      case "getCourseById":
-        result = getCourseById(data.course_id);
-        break;
-      case "updateCourse":
-        result = updateCourse(data.course_id, data);
-        break;
-      case "deleteCourse":
-        result = deleteCourse(data.course_id);
-        break;
-      case "registerUser":
-        result = registerUser(data.email, data.password, data.full_name, data.phone);
-        break;
-      case "loginUser":
-        result = loginUser(data.email, data.password);
-        break;
-      case "getUserBalance":
-        result = getUserBalance(data.user_id);
-        break;
-      case "getUserInfo":
-        result = getUserInfo(data.user_id);
-        break;
-      case "getAllUsers":
-        result = getAllUsers();
-        break;
-      case "depositXu":
-        result = depositXu(data.user_id, data.amount);
-        break;
-      case "getTransactionHistory":
-        result = getTransactionHistory(data.user_id);
-        break;
-      case "getAllTransactions":
-        result = getAllTransactions();
-        break;
-      case "createOrder":
-        result = createOrder(data.user_id, data.course_id, data.amount);
-        break;
-      case "getOrders":
-        result = getOrders(data.user_id);
-        break;
-      case "getAllOrders":
-        result = getAllOrders();
-        break;
-      case "getUserEnrollments":
-        result = getUserEnrollments(data.user_id);
-        break;
-      case "updateProgress":
-        result = updateProgress(data.enrollment_id, data.progress);
-        break;
-      case "getAllEnrollments":
-        result = getAllEnrollments();
-        break;
-      case "getCourseVideos":
-        result = getCourseVideos(data.course_id);
-        break;
-      case "checkCourseAccess":
-        result = checkCourseAccess(data.user_id, data.course_id);
-        break;
-      case "getSettings":
-        result = getSettings();
-        break;
-      case "updateSetting":
-        result = updateSetting(data.key, data.value);
-        break;
-      case "getStatistics":
-        result = getStatistics();
-        break;
-      case "getDashboardData":
-        result = getDashboardData(data.user_id);
-        break;
-      default:
-        result = { error: "Unknown action: " + action };
+    if (result.success) {
+      currentUser = { id: result.userId, name: name, email: email };
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      processPayment(result.userId, courseId, price);
     }
-  } catch (err) {
-    result = { error: err.toString() };
+  } catch (error) {
+    console.error('Lỗi đăng ký:', error);
+    alert('Lỗi đăng ký người dùng');
   }
-  
-  return ContentService.createTextOutput(JSON.stringify(result))
-    .setMimeType(ContentService.MimeType.JSON);
 }
 
-function doGet(e) {
-  return HtmlService.createHtmlOutput(
-    "<h1 style='text-align: center; margin-top: 50px;'>🎓 UNICA API is running</h1>" +
-    "<p style='text-align: center; color: #666;'>Nền tảng học tập trực tuyến</p>"
-  );
+// ============================================
+// 12. XỬ LÝ THANH TOÁN
+// ============================================
+function processPayment(userId, courseId, price) {
+  const methods = ['Thẻ Tín Dụng', 'Ví Điện Tử', 'Chuyển Khoản'];
+  const methodList = methods.map((m, i) => `${i+1}. ${m}`).join('\n');
+  const choice = prompt(`Chọn phương thức thanh toán:\n${methodList}`);
+
+  if (!choice || choice < 1 || choice > 3) {
+    alert('Phương thức không hợp lệ');
+    return;
+  }
+
+  const method = methods[choice - 1];
+
+  // Thêm thanh toán
+  addPaymentRecord(userId, courseId, price, method);
+
+  // Thêm đăng ký
+  addEnrollmentRecord(userId, courseId);
+
+  alert(`✅ Thanh toán thành công!\nPhương thức: ${method}\nSố tiền: ${price.toLocaleString()} VND\n\nBạn có thể bắt đầu học ngay!`);
+  closeCourseModal();
+}
+
+// ============================================
+// 13. THÊM THANH TOÁN
+// ============================================
+async function addPaymentRecord(userId, courseId, amount, method) {
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      payload: JSON.stringify({
+        action: 'addPayment',
+        userId: userId,
+        courseId: courseId,
+        amount: amount,
+        method: method
+      })
+    });
+    const result = await response.json();
+    console.log('Thanh toán thêm:', result);
+  } catch (error) {
+    console.error('Lỗi thêm thanh toán:', error);
+  }
+}
+
+// ============================================
+// 14. THÊM ĐĂNG KÝ
+// ============================================
+async function addEnrollmentRecord(userId, courseId) {
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      payload: JSON.stringify({
+        action: 'addEnrollment',
+        userId: userId,
+        courseId: courseId
+      })
+    });
+    const result = await response.json();
+    console.log('Đăng ký thêm:', result);
+  } catch (error) {
+    console.error('Lỗi thêm đăng ký:', error);
+  }
+}
+
+// ============================================
+// 15. HIỂN THỊ CÁC TRANG
+// ============================================
+function showHome() {
+  document.getElementById('home').style.display = 'block';
+  document.getElementById('categories').style.display = 'block';
+  document.getElementById('courses').style.display = 'block';
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('admin').style.display = 'none';
+}
+
+function showCourses() {
+  document.getElementById('home').style.display = 'none';
+  document.getElementById('categories').style.display = 'block';
+  document.getElementById('courses').style.display = 'block';
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('admin').style.display = 'none';
+}
+
+function showDashboard() {
+  if (!currentUser) {
+    alert('Vui lòng đăng nhập trước!');
+    return;
+  }
+  document.getElementById('home').style.display = 'none';
+  document.getElementById('categories').style.display = 'none';
+  document.getElementById('courses').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('admin').style.display = 'none';
+  loadUserDashboard();
+}
+
+function showAdmin() {
+  if (!currentAdmin) {
+    const password = prompt('Nhập mật khẩu admin:');
+    // Mật khẩu: admin123 (hash SHA256)
+    if (password !== 'admin123') {
+      alert('❌ Mật khẩu sai!');
+      return;
+    }
+    currentAdmin = { id: 'ADM001', name: 'Admin' };
+    localStorage.setItem('currentAdmin', JSON.stringify(currentAdmin));
+  }
+
+  document.getElementById('home').style.display = 'none';
+  document.getElementById('categories').style.display = 'none';
+  document.getElementById('courses').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('admin').style.display = 'block';
+  loadAdminDashboard();
+}
+
+// ============================================
+// 16. LOAD DASHBOARD NGƯỜI DÙNG
+// ============================================
+async function loadUserDashboard() {
+  try {
+    const enrollments = await fetch(`${API_URL}?action=getEnrollments&userId=${currentUser.id}`)
+      .then(r => r.json());
+    const payments = await fetch(`${API_URL}?action=getPayments&userId=${currentUser.id}`)
+      .then(r => r.json());
+
+    // Hiển thị khóa học
+    const myCoursesContainer = document.getElementById('myCoursesContainer');
+    myCoursesContainer.innerHTML = enrollments.map(e => {
+      const course = allCourses.find(c => c.id === e.courseId);
+      return `
+        <div style="padding:1rem; border:2px solid #ffd700; margin:0.5rem 0; border-radius:5px; background:#f9f9f9;">
+          <h4>📚 ${course?.name || 'Khóa Học'}</h4>
+          <p><strong>Trạng Thái:</strong> ${e.status}</p>
+          <p><strong>Tiến Độ:</strong> ${e.progress}%</p>
+          <div style="background:#ddd; height:15px; border-radius:5px; overflow:hidden;">
+            <div style="background:linear-gradient(90deg, #ffd700, #ffed4e); height:100%; width:${e.progress}%;"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    if (enrollments.length === 0) {
+      myCoursesContainer.innerHTML = '<p>Bạn chưa đăng ký khóa học nào</p>';
+    }
+
+    // Hiển thị thanh toán
+    const paymentsContainer = document.getElementById('paymentsContainer');
+    paymentsContainer.innerHTML = payments.map(p => `
+      <div style="padding:1rem; border:1px solid #ddd; margin:0.5rem 0; border-radius:5px; background:#f9f9f9;">
+        <p><strong>💰 Số Tiền:</strong> ${p.amount.toLocaleString()} VND</p>
+        <p><strong>🏦 Phương Thức:</strong> ${p.method}</p>
+        <p><strong>✅ Trạng Thái:</strong> <span style="color:green; font-weight:bold;">${p.status}</span></p>
+        <p><strong>📅 Ngày:</strong> ${new Date(p.date).toLocaleDateString('vi-VN')}</p>
+      </div>
+    `).join('');
+
+    if (payments.length === 0) {
+      paymentsContainer.innerHTML = '<p>Chưa có giao dịch thanh toán</p>';
+    }
+  } catch (error) {
+    console.error('Lỗi tải dashboard:', error);
+  }
+}
+
+// ============================================
+// 17. LOAD ADMIN DASHBOARD
+// ============================================
+async function loadAdminDashboard() {
+  try {
+    const users = await fetch(`${API_URL}?action=getUsers`).then(r => r.json()).catch(() => []);
+    const payments = await fetch(`${API_URL}?action=getAllPayments`).then(r => r.json()).catch(() => []);
+
+    // Tính toán thống kê
+    const totalUsers = users.length;
+    const totalCourses = allCourses.length;
+    const totalRevenue = payments.reduce((sum, p) => sum + p.amount, 0);
+
+    document.getElementById('totalUsers').textContent = totalUsers;
+    document.getElementById('totalCourses').textContent = totalCourses;
+    document.getElementById('totalRevenue').textContent = totalRevenue.toLocaleString() + ' VND';
+
+    // Load bảng
+    loadAdminTables(users, payments);
+  } catch (error) {
+    console.error('Lỗi tải admin dashboard:', error);
+  }
+}
+
+// ============================================
+// 18. LOAD BẢNG ADMIN
+// ============================================
+function loadAdminTables(users, payments) {
+  // Danh mục
+  const categoriesTable = document.getElementById('categoriesTable');
+  categoriesTable.innerHTML = allCategories.map(c => `
+    <tr>
+      <td>${c.id}</td>
+      <td>${c.name}</td>
+      <td>${c.description}</td>
+      <td>
+        <button onclick="editCategory('${c.id}')" class="btn-primary" style="padding:0.5rem 1rem;">✏️ Sửa</button>
+        <button onclick="deleteCategory('${c.id}')" style="padding:0.5rem 1rem; background:#ff4444; color:white; border:none; border-radius:3px; cursor:pointer;">🗑️ Xóa</button>
+      </td>
+    </tr>
+  `).join('');
+
+  // Khóa học
+  const coursesTable = document.getElementById('coursesTable');
+  coursesTable.innerHTML = allCourses.map(c => `
+    <tr>
+      <td>${c.id}</td>
+      <td>${c.name}</td>
+      <td>${c.price.toLocaleString()} VND</td>
+      <td>${c.teacher}</td>
+      <td><span style="background:#90EE90; padding:0.3rem 0.8rem; border-radius:3px;">${c.status}</span></td>
+      <td>
+        <button onclick="editCourse('${c.id}')" class="btn-primary" style="padding:0.5rem 1rem;">✏️ Sửa</button>
+        <button onclick="deleteCourse('${c.id}')" style="padding:0.5rem 1rem; background:#ff4444; color:white; border:none; border-radius:3px; cursor:pointer;">🗑️ Xóa</button>
+      </td>
+    </tr>
+  `).join('');
+
+  // Người dùng
+  const usersTable = document.getElementById('usersTable');
+  usersTable.innerHTML = users.map(u => `
+    <tr>
+      <td>${u.id}</td>
+      <td>${u.name}</td>
+      <td>${u.email}</td>
+      <td>${u.phone}</td>
+      <td>${new Date(u.registerDate).toLocaleDateString('vi-VN')}</td>
+      <td>
+        <button onclick="viewUser('${u.id}')" style="padding:0.5rem 1rem; background:#4444ff; color:white; border:none; border-radius:3px; cursor:pointer;">👁️ Xem</button>
+      </td>
+    </tr>
+  `).join('');
+
+  // Thanh toán
+  const paymentsTable = document.getElementById('paymentsTable');
+  paymentsTable.innerHTML = payments.map(p => `
+    <tr>
+      <td>${p.id}</td>
+      <td>${p.userId}</td>
+      <td>${p.courseId}</td>
+      <td>${p.amount.toLocaleString()} VND</td>
+      <td>${p.method}</td>
+      <td><span style="background:#90EE90; padding:0.3rem 0.8rem; border-radius:3px;">${p.status}</span></td>
+      <td>${new Date(p.date).toLocaleDateString('vi-VN')}</td>
+    </tr>
+  `).join('');
+}
+
+// ============================================
+// 19. SWITCH ADMIN TAB
+// ============================================
+function switchAdminTab(tabName) {
+  // Ẩn tất cả tab
+  document.querySelectorAll('.admin-tab').forEach(tab => {
+    tab.classList.remove('active');
+    tab.style.display = 'none';
+  });
+
+  // Ẩn tất cả nút
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+
+  // Hiển thị tab được chọn
+  const tab = document.getElementById(tabName + '-tab');
+  if (tab) {
+    tab.classList.add('active');
+    tab.style.display = 'block';
+  }
+
+  // Highlight nút
+  event.target.classList.add('active');
+}
+
+// ============================================
+// 20. FORM MODAL
+// ============================================
+function openCategoryForm() {
+  document.getElementById('modalTitle').textContent = '➕ Thêm Danh Mục';
+  document.getElementById('formFields').innerHTML = `
+    <div class="form-group">
+      <label>Tên Danh Mục</label>
+      <input type="text" id="categoryName" required>
+    </div>
+    <div class="form-group">
+      <label>Mô Tả</label>
+      <textarea id="categoryDesc" required></textarea>
+    </div>
+    <div class="form-group">
+      <label>Icon</label>
+      <input type="text" id="categoryIcon" value="📚" required>
+    </div>
+  `;
+  document.getElementById('dynamicForm').dataset.type = 'category';
+  document.getElementById('modalForm').style.display = 'flex';
+}
+
+function openCourseForm() {
+  document.getElementById('modalTitle').textContent = '➕ Thêm Khóa Học';
+  document.getElementById('formFields').innerHTML = `
+    <div class="form-group">
+      <label>Tên Khóa Học</label>
+      <input type="text" id="courseName" required>
+    </div>
+    <div class="form-group">
+      <label>Danh Mục</label>
+      <select id="courseCategory" required>
+        ${allCategories.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Giá (VND)</label>
+      <input type="number" id="coursePrice" required>
+    </div>
+    <div class="form-group">
+      <label>Giảm Giá (%)</label>
+      <input type="number" id="courseDiscount" value="0">
+    </div>
+    <div class="form-group">
+      <label>Giáo Viên</label>
+      <input type="text" id="courseTeacher" required>
+    </div>
+    <div class="form-group">
+      <label>Mô Tả</label>
+      <textarea id="courseDesc" required></textarea>
+    </div>
+  `;
+  document.getElementById('dynamicForm').dataset.type = 'course';
+  document.getElementById('modalForm').style.display = 'flex';
+}
+
+function openLessonForm() {
+  document.getElementById('modalTitle').textContent = '➕ Thêm Bài Học';
+  document.getElementById('formFields').innerHTML = `
+    <div class="form-group">
+      <label>Khóa Học</label>
+      <select id="lessonCourse" required>
+        ${allCourses.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Tiêu Đề</label>
+      <input type="text" id="lessonTitle" required>
+    </div>
+    <div class="form-group">
+      <label>Tuần</label>
+      <input type="number" id="lessonWeek" required>
+    </div>
+    <div class="form-group">
+      <label>Nội Dung</label>
+      <textarea id="lessonContent" required></textarea>
+    </div>
+    <div class="form-group">
+      <label>URL Video</label>
+      <input type="url" id="lessonVideo">
+    </div>
+    <div class="form-group">
+      <label>Thời Lượng</label>
+      <input type="text" id="lessonDuration" placeholder="45 phút">
+    </div>
+  `;
+  document.getElementById('dynamicForm').dataset.type = 'lesson';
+  document.getElementById('modalForm').style.display = 'flex';
+}
+
+function handleFormSubmit(event) {
+  event.preventDefault();
+  const type = document.getElementById('dynamicForm').dataset.type;
+
+  if (type === 'category') {
+    const name = document.getElementById('categoryName').value;
+    const desc = document.getElementById('categoryDesc').value;
+    const icon = document.getElementById('categoryIcon').value;
+    addCategoryRecord(name, desc, icon);
+  } else if (type === 'course') {
+    const name = document.getElementById('courseName').value;
+    const catId = document.getElementById('courseCategory').value;
+    const price = document.getElementById('coursePrice').value;
+    const discount = document.getElementById('courseDiscount').value;
+    const teacher = document.getElementById('courseTeacher').value;
+    const desc = document.getElementById('courseDesc').value;
+    addCourseRecord(name, catId, desc, price, discount, teacher);
+  } else if (type === 'lesson') {
+    const courseId = document.getElementById('lessonCourse').value;
+    const title = document.getElementById('lessonTitle').value;
+    const week = document.getElementById('lessonWeek').value;
+    const content = document.getElementById('lessonContent').value;
+    const video = document.getElementById('lessonVideo').value;
+    const duration = document.getElementById('lessonDuration').value;
+    addLessonRecord(courseId, title, week, content, video, duration);
+  }
+
+  closeModal();
+}
+
+// ============================================
+// 21. THÊM DANH MỤC
+// ============================================
+async function addCategoryRecord(name, desc, icon) {
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      payload: JSON.stringify({
+        action: 'addCategory',
+        name: name,
+        description: desc,
+        icon: icon
+      })
+    });
+    const result = await response.json();
+    if (result.success) {
+      alert('✅ Thêm danh mục thành công!');
+      loadCategories();
+    }
+  } catch (error) {
+    console.error('Lỗi:', error);
+    alert('❌ Lỗi thêm danh mục');
+  }
+}
+
+// ============================================
+// 22. THÊM KHÓA HỌC
+// ============================================
+async function addCourseRecord(name, catId, desc, price, discount, teacher) {
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      payload: JSON.stringify({
+        action: 'addCourse',
+        name: name,
+        categoryId: catId,
+        description: desc,
+        price: parseInt(price),
+        discount: parseInt(discount),
+        teacher: teacher,
+        image: 'https://via.placeholder.com/300x200'
+      })
+    });
+    const result = await response.json();
+    if (result.success) {
+      alert('✅ Thêm khóa học thành công!');
+      loadCourses();
+    }
+  } catch (error) {
+    console.error('Lỗi:', error);
+    alert('❌ Lỗi thêm khóa học');
+  }
+}
+
+// ============================================
+// 23. THÊM BÀI HỌC
+// ============================================
+async function addLessonRecord(courseId, title, week, content, video, duration) {
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      payload: JSON.stringify({
+        action: 'addLesson',
+        courseId: courseId,
+        title: title,
+        week: parseInt(week),
+        content: content,
+        videoUrl: video,
+        duration: duration
+      })
+    });
+    const result = await response.json();
+    if (result.success) {
+      alert('✅ Thêm bài học thành công!');
+    }
+  } catch (error) {
+    console.error('Lỗi:', error);
+    alert('❌ Lỗi thêm bài học');
+  }
+}
+
+// ============================================
+// 24. ĐÓNG MODAL
+// ============================================
+function closeModal() {
+  document.getElementById('modalForm').style.display = 'none';
+}
+
+function closeCourseModal() {
+  document.getElementById('courseModal').style.display = 'none';
+}
+
+// ============================================
+// 25. ĐĂNG XUẤT
+// ============================================
+function logout() {
+  localStorage.removeItem('currentUser');
+  localStorage.removeItem('currentAdmin');
+  currentUser = null;
+  currentAdmin = null;
+  showHome();
+  alert('👋 Đã đăng xuất!');
+}
+
+// ============================================
+// 26. HELPER FUNCTIONS
+// ============================================
+function editCategory(id) {
+  alert('Tính năng sửa đang phát triển');
+}
+
+function deleteCategory(id) {
+  alert('Tính năng xóa đang phát triển');
+}
+
+function editCourse(id) {
+  alert('Tính năng sửa đang phát triển');
+}
+
+function deleteCourse(id) {
+  alert('Tính năng xóa đang phát triển');
+}
+
+function viewUser(id) {
+  alert('Xem chi tiết người dùng: ' + id);
 }
