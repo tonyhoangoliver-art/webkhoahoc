@@ -1,1001 +1,1356 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎓 UNICA - Nền Tảng Học Tập Trực Tuyến</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    :root {
-      --primary: #667eea;
-      --primary-dark: #5568d3;
-      --secondary: #764ba2;
-      --accent: #f093fb;
-      --success: #4caf50;
-      --danger: #e74c3c;
-      --warning: #ff9800;
-      --dark: #1a1a2e;
-      --light: #f5f7fa;
-      --border: #e0e0e0;
-      --shadow: 0 10px 40px rgba(0,0,0,0.1);
-      --shadow-lg: 0 20px 60px rgba(0,0,0,0.15);
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: var(--dark);
-      line-height: 1.6;
-      min-height: 100vh;
-    }
-
-    /* ============ HEADER ============ */
-    header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 15px 0;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      box-shadow: var(--shadow);
-    }
-
-    .header-container {
-      max-width: 1400px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 20px;
-    }
-
-    .logo {
-      font-size: 28px;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-    }
-
-    .logo i {
-      animation: bounce 2s infinite;
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-    }
-
-    .nav-menu {
-      display: flex;
-      gap: 30px;
-      list-style: none;
-    }
-
-    .nav-menu a {
-      color: white;
-      text-decoration: none;
-      cursor: pointer;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .nav-menu a:hover {
-      opacity: 0.8;
-    }
-
-    .user-menu {
-      display: flex;
-      gap: 15px;
-      align-items: center;
-    }
-
-    .balance-display {
-      background: rgba(255,255,255,0.15);
-      padding: 10px 18px;
-      border-radius: 25px;
-      font-size: 14px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 25px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 600;
-      transition: all 0.3s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-    }
-
-    .btn-secondary {
-      background: white;
-      color: var(--primary);
-    }
-
-    .btn-secondary:hover {
-      background: var(--light);
-      transform: translateY(-2px);
-    }
-
-    .btn-success {
-      background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
-      color: white;
-    }
-
-    .btn-success:hover {
-      transform: translateY(-2px);
-    }
-
-    .btn-danger {
-      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-      color: white;
-    }
-
-    /* ============ CONTAINER ============ */
-    .container {
-      max-width: 1400px;
-      margin: 40px auto;
-      padding: 0 20px;
-    }
-
-    .section {
-      display: none;
-      animation: fadeIn 0.5s ease-in;
-    }
-
-    .section.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ============ HERO ============ */
-    .hero {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
-      color: white;
-      padding: 100px 40px;
-      text-align: center;
-      border-radius: 20px;
-      margin-bottom: 50px;
-      box-shadow: var(--shadow-lg);
-    }
-
-    .hero h1 {
-      font-size: 48px;
-      margin-bottom: 15px;
-    }
-
-    .hero p {
-      font-size: 20px;
-      margin-bottom: 30px;
-    }
-
-    /* ============ GRID ============ */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 30px;
-      margin-bottom: 50px;
-    }
-
-    .card {
-      background: white;
-      border-radius: 15px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      transition: all 0.3s;
-    }
-
-    .card:hover {
-      transform: translateY(-10px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .card-image {
-      width: 100%;
-      height: 200px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 60px;
-    }
-
-    .card-content {
-      padding: 25px;
-    }
-
-    .card-title {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 10px;
-      color: var(--dark);
-    }
-
-    .card-text {
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 15px;
-    }
-
-    .card-price {
-      font-size: 24px;
-      font-weight: 900;
-      color: var(--primary);
-      margin-bottom: 15px;
-    }
-
-    .card-btn {
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    /* ============ MODAL ============ */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 2000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.6);
-      overflow-y: auto;
-    }
-
-    .modal.active {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal-content {
-      background: white;
-      padding: 40px;
-      border-radius: 20px;
-      width: 90%;
-      max-width: 500px;
-      box-shadow: var(--shadow-lg);
-      position: relative;
-      animation: slideUp 0.3s ease-out;
-      margin: 20px 0;
-    }
-
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .modal-header {
-      font-size: 26px;
-      font-weight: 900;
-      margin-bottom: 25px;
-      color: var(--dark);
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      font-size: 28px;
-      cursor: pointer;
-      color: #999;
-      background: none;
-      border: none;
-    }
-
-    .modal-close:hover {
-      color: var(--danger);
-    }
-
-    /* ============ FORM ============ */
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-
-    input, textarea, select {
-      width: 100%;
-      padding: 14px;
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      font-size: 14px;
-      font-family: inherit;
-    }
-
-    input:focus, textarea:focus, select:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 120px;
-    }
-
-    /* ============ ALERT ============ */
-    .alert {
-      padding: 16px 20px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      display: none;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .alert.active {
-      display: flex;
-    }
-
-    .alert-success {
-      background: rgba(76, 175, 80, 0.1);
-      color: #2e7d32;
-      border-left: 4px solid #4caf50;
-    }
-
-    .alert-error {
-      background: rgba(231, 76, 60, 0.1);
-      color: #c62828;
-      border-left: 4px solid #e74c3c;
-    }
-
-    .alert-info {
-      background: rgba(102, 126, 234, 0.1);
-      color: #1565c0;
-      border-left: 4px solid #667eea;
-    }
-
-    /* ============ TABLE ============ */
-    .table-wrapper {
-      overflow-x: auto;
-      border-radius: 10px;
-      box-shadow: var(--shadow);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-    }
-
-    thead {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: white;
-    }
-
-    th {
-      padding: 16px;
-      text-align: left;
-      font-weight: 600;
-    }
-
-    td {
-      padding: 16px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    tbody tr:hover {
-      background: var(--light);
-    }
-
-    /* ============ RESPONSIVE ============ */
-    @media (max-width: 768px) {
-      .nav-menu {
-        display: none;
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .hero {
-        padding: 50px 20px;
-      }
-
-      .hero h1 {
-        font-size: 32px;
-      }
-
-      .modal-content {
-        width: 95%;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HOANGPRO COURSE - HỆ THỐNG ĐÀO TẠO</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .admin-subtab-content { display: none; }
+        .admin-subtab-content.active-subtab { display: block; }
+    </style>
 </head>
-<body>
+<body class="bg-gray-50 font-sans text-gray-800 flex flex-col min-h-screen">
 
-<!-- ============ HEADER ============ -->
-<header>
-  <div class="header-container">
-    <div class="logo" onclick="showSection('home')">
-      <i class="fas fa-graduation-cap"></i> UNICA
-    </div>
-    <ul class="nav-menu">
-      <li><a onclick="showSection('home')"><i class="fas fa-home"></i> Trang Chủ</a></li>
-      <li><a onclick="showSection('courses')"><i class="fas fa-book"></i> Khóa Học</a></li>
-      <li><a onclick="showSection('my-courses')"><i class="fas fa-graduation-cap"></i> Khóa Của Tôi</a></li>
-      <li><a onclick="showSection('admin')"><i class="fas fa-cog"></i> Admin</a></li>
-    </ul>
-    <div class="user-menu">
-      <div class="balance-display">
-        <i class="fas fa-coins"></i> <span id="balance">0</span> Xu
-      </div>
-      <button class="btn btn-secondary" onclick="showModal('deposit-modal')">
-        <i class="fas fa-plus-circle"></i> Nạp Xu
-      </button>
-      <button class="btn btn-secondary" onclick="logout()">
-        <i class="fas fa-sign-out-alt"></i> Đăng Xuất
-      </button>
-    </div>
-  </div>
-</header>
-
-<!-- ============ MAIN CONTENT ============ -->
-<div class="container">
-  <div id="alert" class="alert"></div>
-
-  <!-- HOME -->
-  <div id="home" class="section active">
-    <div class="hero">
-      <h1><i class="fas fa-rocket"></i> Chào Mừng Đến UNICA</h1>
-      <p>Nền tảng học tập trực tuyến hàng đầu Việt Nam</p>
-      <button class="btn btn-secondary" onclick="showSection('courses')">
-        <i class="fas fa-arrow-right"></i> Khám Phá Khóa Học
-      </button>
-    </div>
-  </div>
-
-  <!-- COURSES -->
-  <div id="courses" class="section">
-    <h2 style="color: white; margin-bottom: 30px;">📚 Tất Cả Khóa Học</h2>
-    <div id="courses-grid" class="grid"></div>
-  </div>
-
-  <!-- MY COURSES -->
-  <div id="my-courses" class="section">
-    <h2 style="color: white; margin-bottom: 30px;">📖 Khóa Học Của Tôi</h2>
-    <div id="my-courses-grid" class="grid"></div>
-  </div>
-
-  <!-- ADMIN -->
-  <div id="admin" class="section">
-    <div style="background: white; padding: 30px; border-radius: 15px;">
-      <h2 style="margin-bottom: 20px;">⚙️ Bảng Điều Khiển Admin</h2>
-      
-      <div style="display: flex; gap: 10px; margin-bottom: 30px; border-bottom: 2px solid var(--border); padding-bottom: 20px;">
-        <button class="tab-btn active" onclick="switchAdminTab('courses-admin')">
-          <i class="fas fa-book"></i> Khóa Học
-        </button>
-        <button class="tab-btn" onclick="switchAdminTab('users-admin')">
-          <i class="fas fa-users"></i> Người Dùng
-        </button>
-        <button class="tab-btn" onclick="switchAdminTab('orders-admin')">
-          <i class="fas fa-shopping-cart"></i> Đơn Hàng
-        </button>
-      </div>
-
-      <div id="courses-admin" class="tab-content active">
-        <button class="btn btn-primary" onclick="showModal('add-course-modal')" style="margin-bottom: 20px;">
-          <i class="fas fa-plus"></i> Thêm Khóa Học
-        </button>
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Tên Khóa</th>
-                <th>Giá (Xu)</th>
-                <th>Giảng Viên</th>
-                <th>Hành Động</th>
-              </tr>
-            </thead>
-            <tbody id="courses-table-body"></tbody>
-          </table>
+    <header class="bg-slate-800 text-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('homepage-tab')">
+                <i class="fa-solid fa-graduation-cap text-3xl text-indigo-400"></i>
+                <span class="text-xl font-bold tracking-wider">HOANGPRO COURSE</span>
+            </div>
+            <nav class="flex space-x-4 items-center">
+                <div id="auth-header-section" class="flex space-x-2">
+                    <button onclick="switchTab('auth-tab')" class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 transition flex items-center space-x-2 cursor-pointer text-sm font-medium">
+                        <i class="fa-solid fa-right-to-bracket"></i> <span>Đăng nhập</span>
+                    </button>
+                    <button onclick="switchTab('register-tab')" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition flex items-center space-x-2 cursor-pointer text-sm font-medium">
+                        <i class="fa-solid fa-user-plus"></i> <span>Đăng ký</span>
+                    </button>
+                </div>
+                <div id="admin-nav-wrapper" class="hidden">
+                    <button onclick="loadAdminData()" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition flex items-center space-x-2 cursor-pointer text-sm font-semibold">
+                        <i class="fa-solid fa-screwdriver-wrench"></i> <span>Bảng điều khiển Admin</span>
+                    </button>
+                </div>
+                <div id="user-logout-wrapper" class="hidden flex items-center space-x-3">
+                    <button onclick="loadMyCoursesTab()" class="px-3.5 py-1.5 rounded-lg bg-emerald-700/80 hover:bg-emerald-600 transition text-xs font-medium text-white cursor-pointer flex items-center space-x-1">
+                        <i class="fa-solid fa-book-bookmark"></i> <span>Khóa học của tôi</span>
+                    </button>
+                    <button onclick="loadUserPaymentHistories()" class="px-3.5 py-1.5 rounded-lg bg-sky-700/80 hover:bg-sky-600 transition text-xs font-medium text-white cursor-pointer flex items-center space-x-1">
+                        <i class="fa-solid fa-clock-rotate-left"></i> <span>Lịch sử thanh toán</span>
+                    </button>
+                    <span id="nav-username" class="text-xs font-semibold text-emerald-300 bg-emerald-950/40 px-3 py-1.5 rounded-full border border-emerald-800/60"></span>
+                    <button onclick="logout()" class="px-3.5 py-2 rounded-lg bg-rose-700/80 hover:bg-rose-600 transition text-xs font-medium text-white cursor-pointer flex items-center space-x-1">
+                        <i class="fa-solid fa-right-from-bracket"></i> <span>Thoát</span>
+                    </button>
+                </div>
+            </nav>
         </div>
-      </div>
+    </header>
 
-      <div id="users-admin" class="tab-content" style="display: none;">
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Email</th>
-                <th>Tên</th>
-                <th>Số Dư (Xu)</th>
-              </tr>
-            </thead>
-            <tbody id="users-table-body"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div id="orders-admin" class="tab-content" style="display: none;">
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>ID Đơn</th>
-                <th>User</th>
-                <th>Khóa</th>
-                <th>Số Tiền</th>
-              </tr>
-            </thead>
-            <tbody id="orders-table-body"></tbody>
-          </table>
-        </div>
-      </div>
+    <div id="global-toast" class="hidden fixed top-20 right-5 max-w-sm bg-emerald-500 text-white p-4 rounded-xl shadow-lg border-l-4 border-emerald-800 flex items-center space-x-3 z-50">
+        <i class="fa-solid fa-circle-check text-xl"></i>
+        <p id="toast-msg" class="text-sm font-medium"></p>
     </div>
-  </div>
-</div>
 
-<!-- ============ MODALS ============ -->
-
-<!-- Login Modal -->
-<div id="login-modal" class="modal active">
-  <div class="modal-content">
-    <button class="modal-close" onclick="closeModal('login-modal')"><i class="fas fa-times"></i></button>
-    <div class="modal-header"><i class="fas fa-sign-in-alt"></i> Đăng Nhập</div>
-    
-    <form onsubmit="handleLogin(event)">
-      <div class="form-group">
-        <label>Email:</label>
-        <input type="email" id="login-email" placeholder="Nhập email" required>
-      </div>
-      <div class="form-group">
-        <label>Mật Khẩu:</label>
-        <input type="password" id="login-password" placeholder="Nhập mật khẩu" required>
-      </div>
-      <button type="submit" class="btn btn-primary" style="width: 100%;">
-        <i class="fas fa-arrow-right"></i> Đăng Nhập
-      </button>
-    </form>
-
-    <div style="text-align: center; margin-top: 20px; color: #666;">
-      <p>Chưa có tài khoản? 
-        <a onclick="switchModal('login-modal', 'register-modal')" style="color: var(--primary); cursor: pointer; font-weight: 600;">Đăng Ký</a>
-      </p>
-      <hr style="margin: 15px 0; border: none; border-top: 1px solid var(--border);">
-      <p style="font-size: 12px;">
-        <strong>Demo:</strong><br>
-        user@demo.com / Demo@123
-      </p>
-    </div>
-  </div>
-</div>
-
-<!-- Register Modal -->
-<div id="register-modal" class="modal">
-  <div class="modal-content">
-    <button class="modal-close" onclick="closeModal('register-modal')"><i class="fas fa-times"></i></button>
-    <div class="modal-header"><i class="fas fa-user-plus"></i> Đăng Ký</div>
-    
-    <form onsubmit="handleRegister(event)">
-      <div class="form-group">
-        <label>Email:</label>
-        <input type="email" id="register-email" placeholder="Nhập email" required>
-      </div>
-      <div class="form-group">
-        <label>Mật Khẩu:</label>
-        <input type="password" id="register-password" placeholder="Nhập mật khẩu" required minlength="8">
-      </div>
-      <div class="form-group">
-        <label>Tên Đầy Đủ:</label>
-        <input type="text" id="register-fullname" placeholder="Nhập tên" required>
-      </div>
-      <div class="form-group">
-        <label>Số Điện Thoại:</label>
-        <input type="tel" id="register-phone" placeholder="Nhập số điện thoại" required>
-      </div>
-      <button type="submit" class="btn btn-primary" style="width: 100%;">
-        <i class="fas fa-arrow-right"></i> Đăng Ký
-      </button>
-    </form>
-  </div>
-</div>
-
-<!-- Deposit Modal -->
-<div id="deposit-modal" class="modal">
-  <div class="modal-content">
-    <button class="modal-close" onclick="closeModal('deposit-modal')"><i class="fas fa-times"></i></button>
-    <div class="modal-header"><i class="fas fa-coins"></i> Nạp Xu</div>
-    
-    <form onsubmit="handleDeposit(event)">
-      <div class="form-group">
-        <label>Số Xu:</label>
-        <input type="number" id="deposit-amount" min="10000" step="10000" placeholder="Nhập số xu" required>
-      </div>
-      <button type="submit" class="btn btn-success" style="width: 100%;">
-        <i class="fas fa-check"></i> Nạp Xu
-      </button>
-    </form>
-  </div>
-</div>
-
-<!-- Add Course Modal -->
-<div id="add-course-modal" class="modal">
-  <div class="modal-content">
-    <button class="modal-close" onclick="closeModal('add-course-modal')"><i class="fas fa-times"></i></button>
-    <div class="modal-header"><i class="fas fa-plus-circle"></i> Thêm Khóa Học</div>
-    
-    <form onsubmit="handleAddCourse(event)">
-      <div class="form-group">
-        <label>Tên Khóa Học:</label>
-        <input type="text" id="course-name" placeholder="Nhập tên" required>
-      </div>
-      <div class="form-group">
-        <label>Mô Tả:</label>
-        <textarea id="course-description" placeholder="Nhập mô tả" required></textarea>
-      </div>
-      <div class="form-group">
-        <label>Giá (Xu):</label>
-        <input type="number" id="course-price" min="0" placeholder="Nhập giá" required>
-      </div>
-      <div class="form-group">
-        <label>Giảng Viên:</label>
-        <input type="text" id="course-instructor" placeholder="Nhập tên giảng viên" required>
-      </div>
-      <div class="form-group">
-        <label>Danh Mục:</label>
-        <select id="course-category" required>
-          <option value="">-- Chọn --</option>
-          <option value="Web">Web Development</option>
-          <option value="Mobile">Mobile Development</option>
-          <option value="Data">Data Science</option>
-        </select>
-      </div>
-      <button type="submit" class="btn btn-primary" style="width: 100%;">
-        <i class="fas fa-save"></i> Thêm
-      </button>
-    </form>
-  </div>
-</div>
-
-<script>
-  // ⚠️ THAY ĐỔI DÒNG NÀY BẰNG DEPLOYMENT ID CỦA BẠN
-  const API_URL = "https://script.google.com/macros/d/YOUR_DEPLOYMENT_ID/useweb?action=";
-  
-  let currentUser = null;
-  let allCourses = [];
-
-  // ============ INITIALIZATION ============
-  window.addEventListener('load', () => {
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-      currentUser = JSON.parse(savedUser);
-      closeModal('login-modal');
-      updateUI();
-      loadCourses();
-    }
-  });
-
-  // ============ API CALLS ============
-  async function apiCall(action, data = {}) {
-    try {
-      const response = await fetch(API_URL + action, {
-        method: 'POST',
-        body: JSON.stringify(data)
-      });
-      return await response.json();
-    } catch (error) {
-      console.error('API Error:', error);
-      showAlert('❌ Lỗi kết nối!', 'error');
-      return null;
-    }
-  }
-
-  // ============ AUTH ============
-  async function handleLogin(event) {
-    event.preventDefault();
-    
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
-    
-    const result = await apiCall('loginUser', { email, password });
-    
-    if (result && result.success) {
-      currentUser = result;
-      localStorage.setItem('currentUser', JSON.stringify(currentUser));
-      closeModal('login-modal');
-      updateUI();
-      loadCourses();
-      showAlert('✅ Đăng nhập thành công!', 'success');
-    } else {
-      showAlert('❌ Email hoặc mật khẩu không đúng!', 'error');
-    }
-  }
-
-  async function handleRegister(event) {
-    event.preventDefault();
-    
-    const email = document.getElementById('register-email').value;
-    const password = document.getElementById('register-password').value;
-    const fullName = document.getElementById('register-fullname').value;
-    const phone = document.getElementById('register-phone').value;
-    
-    const result = await apiCall('registerUser', { email, password, full_name: fullName, phone });
-    
-    if (result && result.success) {
-      showAlert('✅ Đăng ký thành công!', 'success');
-      switchModal('register-modal', 'login-modal');
-    } else {
-      showAlert('❌ Đăng ký thất bại!', 'error');
-    }
-  }
-
-  function logout() {
-    if (confirm('Đăng xuất?')) {
-      currentUser = null;
-      localStorage.removeItem('currentUser');
-      showModal('login-modal');
-      showAlert('✅ Đã đăng xuất!', 'info');
-    }
-  }
-
-  // ============ COURSES ============
-  async function loadCourses() {
-    const result = await apiCall('getCourses');
-    if (result && Array.isArray(result)) {
-      allCourses = result;
-      displayCourses(result);
-    }
-  }
-
-  function displayCourses(courses) {
-    const grid = document.getElementById('courses-grid');
-    grid.innerHTML = '';
-    
-    courses.forEach(course => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <div class="card-image">📚</div>
-        <div class="card-content">
-          <div class="card-title">${course.name}</div>
-          <div class="card-text">👨‍🏫 ${course.instructor}</div>
-          <div class="card-text">${course.description.substring(0, 60)}...</div>
-          <div class="card-price">${course.price.toLocaleString()} Xu</div>
-          <button class="card-btn" onclick="enrollCourse('${course.course_id}', ${course.price})">
-            Mua Khóa Học
-          </button>
+    <main class="flex-grow container mx-auto px-6 py-8">
+        
+        <div id="website-cover" class="mb-10 rounded-3xl overflow-hidden shadow-xl border border-slate-800">
+             <img src="https://i.ibb.co/qMPKmY7J/ANH-BIA-1.png" alt="Ảnh bìa Hoangpro Course" class="w-full h-auto object-cover max-h-[350px]">
         </div>
-      `;
-      grid.appendChild(card);
-    });
-  }
 
-  async function enrollCourse(courseId, price) {
-    if (!currentUser) {
-      showAlert('❌ Vui lòng đăng nhập!', 'error');
-      return;
-    }
-    
-    if (currentUser.balance < price) {
-      showAlert('❌ Số dư không đủ!', 'error');
-      return;
-    }
-    
-    const result = await apiCall('createOrder', {
-      user_id: currentUser.user_id,
-      course_id: courseId,
-      amount: price
-    });
-    
-    if (result && result.success) {
-      currentUser.balance = result.new_balance;
-      localStorage.setItem('currentUser', JSON.stringify(currentUser));
-      updateUI();
-      showAlert('✅ Mua khóa học thành công!', 'success');
-    } else {
-      showAlert('❌ Mua khóa học thất bại!', 'error');
-    }
-  }
+        <div id="homepage-tab" class="tab-content active max-w-7xl mx-auto">
+            
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8 flex flex-col md:flex-row gap-6 items-center justify-between">
+                <div class="relative w-full md:w-1/3">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" id="smartSearchInput" onkeyup="triggerSmartSearchFilterSort()" placeholder="Tìm kiếm tựa đề khóa học, mô tả..." class="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                </div>
+                <div class="flex flex-wrap items-center gap-4 w-full md:w-auto justify-end">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-500 font-semibold uppercase tracking-wider"><i class="fa-solid fa-filter"></i> Phân loại cấp độ:</span>
+                        <select id="smartFilterLevel" onchange="triggerSmartSearchFilterSort()" class="text-sm px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-gray-600 w-40">
+                            <option value="all">Tất cả cấp độ</option>
+                            <option value="beginner">Beginner (Cơ bản)</option>
+                            <option value="intermediate">Intermediate (Trung cấp)</option>
+                            <option value="advanced">Advanced (Nâng cao)</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-500 font-semibold uppercase tracking-wider"><i class="fa-solid fa-arrow-up-wide-short"></i> Sắp xếp:</span>
+                        <select id="smartSortFieldOrder" onchange="triggerSmartSearchFilterSort()" class="text-sm px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-gray-600 w-44">
+                            <option value="default">Mặc định hệ thống</option>
+                            <option value="title_asc">Tên A - Z</option>
+                            <option value="title_desc">Tên Z - A</option>
+                            <option value="price_asc">Giá tăng dần</option>
+                            <option value="price_desc">Giá giảm dần</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
-  // ============ DEPOSIT ============
-  async function handleDeposit(event) {
-    event.preventDefault();
-    
-    const amount = parseInt(document.getElementById('deposit-amount').value);
-    
-    const result = await apiCall('depositXu', {
-      user_id: currentUser.user_id,
-      amount: amount
-    });
-    
-    if (result && result.success) {
-      currentUser.balance = result.new_balance;
-      localStorage.setItem('currentUser', JSON.stringify(currentUser));
-      updateUI();
-      closeModal('deposit-modal');
-      showAlert('✅ Nạp xu thành công!', 'success');
-      document.getElementById('deposit-amount').value = '';
-    }
-  }
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">Danh mục Khóa học</h2>
+                    <p class="text-sm text-gray-500 mt-1">Lựa chọn các chủ đề học tập chất lượng cao</p>
+                </div>
+                <div class="flex flex-wrap gap-2" id="filterCategoryButtons">
+                    <button onclick="filterCoursesByCategory('all')" class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold text-sm transition cursor-pointer">Tất cả</button>
+                </div>
+            </div>
 
-  // ============ ADMIN ============
-  async function handleAddCourse(event) {
-    event.preventDefault();
-    
-    const data = {
-      name: document.getElementById('course-name').value,
-      description: document.getElementById('course-description').value,
-      price: parseInt(document.getElementById('course-price').value),
-      instructor: document.getElementById('course-instructor').value,
-      category: document.getElementById('course-category').value
-    };
-    
-    const result = await apiCall('addCourse', data);
-    
-    if (result && result.success) {
-      closeModal('add-course-modal');
-      showAlert('✅ Thêm khóa học thành công!', 'success');
-      loadCourses();
-      loadAdminCourses();
-      event.target.reset();
-    }
-  }
+            <div class="grid md:grid-cols-3 gap-6" id="coursesGridList"></div>
+            
+            <div id="courseStudySection" class="hidden mt-12 bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                 <div class="flex items-center justify-between border-b pb-4 mb-6">
+                     <div>
+                         <h3 id="studyCourseTitle" class="text-xl font-bold text-slate-800"></h3>
+                         <p class="text-xs text-slate-500 mt-0.5">Hệ thống bài giảng được sắp xếp logic</p>
+                     </div>
+                     <button onclick="backToHome()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl text-xs font-bold transition cursor-pointer">
+                         <i class="fa-solid fa-arrow-left"></i> Quay lại trang chủ
+                     </button>
+                 </div>
+                 <div class="grid md:grid-cols-3 gap-8">
+                     <div class="md:col-span-2 space-y-4" id="lessonsContainer"></div>
+                     <div>
+                         <div class="bg-slate-50 p-5 rounded-2xl border border-gray-100">
+                             <h4 class="font-bold text-slate-800 text-sm mb-3">Kích hoạt khóa học trọn đời</h4>
+                             <p class="text-xs text-gray-500 leading-relaxed mb-5">Đăng ký mua ngay để mở khóa toàn bộ nội dung bài giảng ẩn và nhận hỗ trợ.</p>
+                             <div class="flex justify-between items-center mb-4">
+                                 <span class="text-xs font-semibold text-gray-500">Giá thanh toán:</span>
+                                 <span id="studyCoursePrice" class="text-lg font-extrabold text-emerald-600"></span>
+                             </div>
+                             <button id="btnBuyCourseAction" onclick="buyCurrentCourse()" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold rounded-xl shadow-sm transition cursor-pointer mb-6">
+                                 <i class="fa-solid fa-cart-shopping"></i> Thanh toán khóa học
+                             </button>
 
-  async function loadAdminCourses() {
-    const result = await apiCall('getCourses');
-    if (result && Array.isArray(result)) {
-      const tbody = document.getElementById('courses-table-body');
-      tbody.innerHTML = '';
-      
-      result.forEach(course => {
-        const row = tbody.insertRow();
-        row.innerHTML = `
-          <td>${course.course_id}</td>
-          <td>${course.name}</td>
-          <td>${course.price.toLocaleString()}</td>
-          <td>${course.instructor}</td>
-          <td>
-            <button class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="deleteCourseAdmin('${course.course_id}')">Xóa</button>
-          </td>
-        `;
-      });
-    }
-  }
+                             <div class="border-t pt-4 border-slate-200/60">
+                                 <h5 class="text-xs font-bold text-slate-700 mb-2 text-center">Quét mã QR để thanh toán nhanh</h5>
+                                 <img src="https://i.ibb.co/1frYwFVh/qr-sepay-1.png" alt="QR Code Thanh Toán" class="w-48 h-48 mx-auto object-contain rounded-xl border border-slate-200 bg-white p-2">
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+            </div>
+        </div>
 
-  async function deleteCourseAdmin(courseId) {
-    if (confirm('Xóa khóa học này?')) {
-      const result = await apiCall('deleteCourse', { course_id: courseId });
-      if (result && result.success) {
-        showAlert('✅ Xóa thành công!', 'success');
-        loadAdminCourses();
-        loadCourses();
-      }
-    }
-  }
+        <div id="auth-tab" class="tab-content max-w-md mx-auto bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center space-x-2 border-b pb-3">
+                <i class="fa-solid fa-lock-open text-indigo-600"></i> <span>Đăng nhập hệ thống</span>
+            </h2>
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Địa chỉ Email</label>
+                    <input type="email" id="loginEmail" required class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Nhập email...">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Mật khẩu</label>
+                    <input type="password" id="loginPassword" required class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Mật khẩu...">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3.5 rounded-lg transition cursor-pointer text-sm">Đăng nhập ngay</button>
+                <button type="button" onclick="switchTab('homepage-tab')" class="w-full bg-gray-50 hover:bg-gray-100 text-gray-600 font-medium text-xs py-2.5 rounded-lg border border-gray-200 transition cursor-pointer">Hủy, về trang chủ</button>
+            </form>
+        </div>
 
-  // ============ UI ============
-  function updateUI() {
-    if (currentUser) {
-      document.getElementById('balance').textContent = currentUser.balance.toLocaleString();
-    }
-  }
+        <div id="register-tab" class="tab-content max-w-md mx-auto bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center space-x-2 border-b pb-3">
+                <i class="fa-solid fa-user-plus text-indigo-600"></i> <span>Đăng ký tài khoản</span>
+            </h2>
+            <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Họ và tên</label>
+                    <input type="text" id="regName" required class="w-full px-4 py-2.5 rounded-lg border border-gray-200" placeholder="Nguyễn Văn A">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Địa chỉ Email</label>
+                    <input type="email" id="regEmail" required class="w-full px-4 py-2.5 rounded-lg border border-gray-200" placeholder="user@example.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Số điện thoại</label>
+                    <input type="tel" id="regPhone" class="w-full px-4 py-2.5 rounded-lg border border-gray-200" placeholder="0123456789">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Mật khẩu</label>
+                    <input type="password" id="regPassword" required class="w-full px-4 py-2.5 rounded-lg border border-gray-200" placeholder="Tạo mật khẩu">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3.5 rounded-lg transition cursor-pointer text-sm">Đăng ký tài khoản</button>
+                <button type="button" onclick="switchTab('homepage-tab')" class="w-full bg-gray-50 hover:bg-gray-100 text-gray-600 font-medium text-xs py-2.5 rounded-lg border border-gray-200 transition cursor-pointer">Hủy, về trang chủ</button>
+            </form>
+        </div>
 
-  function showSection(sectionId) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.getElementById(sectionId).classList.add('active');
-    
-    if (sectionId === 'courses') loadCourses();
-    if (sectionId === 'admin') {
-      loadAdminCourses();
-      loadAdminUsers();
-      loadAdminOrders();
-    }
-  }
+        <div id="my-courses-tab" class="tab-content max-w-7xl mx-auto">
+             <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 mb-6 flex justify-between items-center">
+                  <div>
+                      <h2 class="text-2xl font-extrabold text-slate-800">Khóa học của tôi</h2>
+                      <p class="text-sm text-gray-500 mt-1">Danh sách các khóa học bạn đã thanh toán và kích hoạt thành công</p>
+                  </div>
+                  <button onclick="switchTab('homepage-tab')" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl text-xs font-bold transition cursor-pointer">
+                      <i class="fa-solid fa-arrow-left"></i> Về trang chủ
+                  </button>
+             </div>
+             <div class="grid md:grid-cols-3 gap-6" id="myCoursesGridList"></div>
+        </div>
 
-  function showModal(modalId) {
-    document.getElementById(modalId).classList.add('active');
-  }
+        <div id="payment-history-tab" class="tab-content max-w-4xl mx-auto">
+             <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                  <div class="flex justify-between items-center border-b pb-5 mb-6">
+                       <div>
+                           <h2 class="text-xl font-extrabold text-slate-800">Lịch sử giao dịch thanh toán khóa học</h2>
+                           <p class="text-xs text-gray-400 mt-1">Theo dõi trạng thái mua và kích hoạt khóa học của bạn</p>
+                       </div>
+                       <button onclick="switchTab('homepage-tab')" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl text-xs font-bold transition cursor-pointer">
+                           <i class="fa-solid fa-arrow-left"></i> Về trang chủ
+                       </button>
+                  </div>
+                  <div class="overflow-x-auto">
+                      <table class="w-full text-left text-sm border-collapse">
+                          <thead class="bg-slate-50 text-slate-600 uppercase text-xs font-extrabold tracking-wider">
+                              <tr>
+                                  <th class="p-3">Mã đơn</th>
+                                  <th class="p-3">Khóa học</th>
+                                  <th class="p-3">Thành tiền</th>
+                                  <th class="p-3">Trạng thái</th>
+                                  <th class="p-3">Ngày tạo</th>
+                              </tr>
+                          </thead>
+                          <tbody id="tblUserOrders" class="divide-y divide-gray-100 text-gray-700 text-xs font-medium"></tbody>
+                      </table>
+                  </div>
+             </div>
+        </div>
 
-  function closeModal(modalId) {
-    document.getElementById(modalId).classList.remove('active');
-  }
+        <div id="admin-tab" class="tab-content">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
+                    <div class="p-4 rounded-xl bg-indigo-100 text-indigo-600"><i class="fa-solid fa-users text-2xl"></i></div>
+                    <div>
+                        <p class="text-sm text-gray-500 uppercase tracking-wider font-medium">Thành viên</p>
+                        <h3 id="m-users" class="text-2xl font-bold">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
+                    <div class="p-4 rounded-xl bg-emerald-100 text-emerald-600"><i class="fa-solid fa-book-bookmark text-2xl"></i></div>
+                    <div>
+                        <p class="text-sm text-gray-500 uppercase tracking-wider font-medium">Khóa học</p>
+                        <h3 id="m-courses" class="text-2xl font-bold">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
+                    <div class="p-4 rounded-xl bg-amber-100 text-amber-600"><i class="fa-solid fa-photo-film text-2xl"></i></div>
+                    <div>
+                        <p class="text-sm text-gray-500 uppercase tracking-wider font-medium">Bài giảng</p>
+                        <h3 id="m-lessons" class="text-2xl font-bold">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
+                    <div class="p-4 rounded-xl bg-sky-100 text-sky-600"><i class="fa-solid fa-sack-dollar text-2xl"></i></div>
+                    <div>
+                        <p class="text-sm text-gray-500 uppercase tracking-wider font-medium">Doanh thu</p>
+                        <h3 id="m-revenue" class="text-2xl font-bold">0 VNĐ</h3>
+                    </div>
+                </div>
+            </div>
 
-  function switchModal(closeId, openId) {
-    closeModal(closeId);
-    showModal(openId);
-  }
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-8">
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="switchAdminSubTab('admin-categories')" class="admin-subtab-btn px-5 py-2.5 rounded-lg bg-indigo-50 text-indigo-700 font-medium transition cursor-pointer text-xs">Danh mục</button>
+                    <button onclick="switchAdminSubTab('admin-courses')" class="admin-subtab-btn px-5 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 font-medium transition cursor-pointer text-xs">Khóa học</button>
+                    <button onclick="switchAdminSubTab('admin-lessons')" class="admin-subtab-btn px-5 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 font-medium transition cursor-pointer text-xs">Bài học</button>
+                    <button onclick="switchAdminSubTab('admin-users')" class="admin-subtab-btn px-5 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 font-medium transition cursor-pointer text-xs">Thành viên</button>
+                    <button onclick="switchAdminSubTab('admin-orders')" class="admin-subtab-btn px-5 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 font-medium transition cursor-pointer text-xs">Đơn hàng</button>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-3 w-full md:w-auto bg-gray-50 p-2.5 rounded-lg border border-gray-100">
+                    <span class="text-xs text-gray-500 font-semibold uppercase tracking-wider"><i class="fa-solid fa-filter"></i> Lọc & Sắp xếp:</span>
+                    <input type="text" id="smartFilterKeyword" onkeyup="triggerSmartFilterSort()" placeholder="Từ khóa tìm kiếm..." class="text-sm px-3 py-1.5 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 w-full md:w-44">
+                    <select id="smartSortField" onchange="triggerSmartFilterSort()" class="text-sm px-3 py-1.5 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        <option value="">Sắp xếp theo...</option>
+                        <option value="id">Mã ID</option>
+                        <option value="name">Tên / Tiêu đề</option>
+                        <option value="status">Trạng thái</option>
+                        <option value="order">Thứ tự</option>
+                    </select>
+                    <select id="smartSortOrder" onchange="triggerSmartFilterSort()" class="text-sm px-3 py-1.5 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        <option value="asc">Tăng dần (A-Z)</option>
+                        <option value="desc">Giảm dần (Z-A)</option>
+                    </select>
+                </div>
+            </div>
 
-  function switchAdminTab(tabId) {
-    document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-    document.getElementById(tabId).style.display = 'block';
-  }
+            <div id="admin-categories" class="admin-subtab-content active-subtab bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold text-gray-700">Quản lý Danh mục (Categories)</h3>
+                    <button onclick="openAddCategoryModal()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-500 transition cursor-pointer flex items-center space-x-2">
+                        <i class="fa-solid fa-plus"></i> <span>Thêm danh mục</span>
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead class="bg-gray-100 text-gray-600 uppercase text-xs font-semibold tracking-wider">
+                            <tr>
+                                <th class="p-3">Mã ID</th>
+                                <th class="p-3">Tên danh mục</th>
+                                <th class="p-3">Slug</th>
+                                <th class="p-3">Trạng thái</th>
+                                <th class="p-3">Thứ tự (Tự động)</th>
+                                <th class="p-3 text-right">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblCategories" class="divide-y divide-gray-100 text-gray-700"></tbody>
+                    </table>
+                </div>
+            </div>
 
-  function showAlert(message, type = 'info') {
-    const alert = document.getElementById('alert');
-    alert.textContent = message;
-    alert.className = `alert active alert-${type}`;
-    
-    setTimeout(() => {
-      alert.classList.remove('active');
-    }, 3000);
-  }
+            <div id="admin-courses" class="admin-subtab-content bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold text-gray-700">Quản lý Khóa học (Courses)</h3>
+                    <button onclick="openAddCourseModal()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-500 transition cursor-pointer flex items-center space-x-2">
+                        <i class="fa-solid fa-plus"></i> <span>Thêm khóa học</span>
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead class="bg-gray-100 text-gray-600 uppercase text-xs font-semibold tracking-wider">
+                            <tr>
+                                <th class="p-3">Mã ID</th>
+                                <th class="p-3">Tiêu đề khóa học</th>
+                                <th class="p-3">Danh mục</th>
+                                <th class="p-3">Mức độ</th>
+                                <th class="p-3">Giá KM</th>
+                                <th class="p-3">Trạng thái</th>
+                                <th class="p-3 text-right">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblCourses" class="divide-y divide-gray-100 text-gray-700"></tbody>
+                    </table>
+                </div>
+            </div>
 
-  async function loadAdminUsers() {
-    const result = await apiCall('getAllUsers');
-    if (result && Array.isArray(result)) {
-      const tbody = document.getElementById('users-table-body');
-      tbody.innerHTML = '';
-      
-      result.forEach(user => {
-        const row = tbody.insertRow();
-        row.innerHTML = `
-          <td>${user.user_id}</td>
-          <td>${user.email}</td>
-          <td>${user.full_name}</td>
-          <td>${user.balance.toLocaleString()}</td>
-        `;
-      });
-    }
-  }
+            <div id="admin-lessons" class="admin-subtab-content bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold text-gray-700">Quản lý Bài học (Lessons)</h3>
+                    <button onclick="openAddLessonModal()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-500 transition cursor-pointer flex items-center space-x-2">
+                        <i class="fa-solid fa-plus"></i> <span>Thêm bài học</span>
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead class="bg-gray-100 text-gray-600 uppercase text-xs font-semibold tracking-wider">
+                            <tr>
+                                <th class="p-3">Mã ID</th>
+                                <th class="p-3">Mã Course ID</th>
+                                <th class="p-3">Chương số</th>
+                                <th class="p-3">Tiêu đề bài học</th>
+                                <th class="p-3">Kiểu</th>
+                                <th class="p-3">Thứ tự (Tự động)</th>
+                                <th class="p-3 text-right">Quản trị</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblLessons" class="divide-y divide-gray-100 text-gray-700"></tbody>
+                    </table>
+                </div>
+            </div>
 
-  async function loadAdminOrders() {
-    const result = await apiCall('getAllOrders');
-    if (result && Array.isArray(result)) {
-      const tbody = document.getElementById('orders-table-body');
-      tbody.innerHTML = '';
-      
-      result.forEach(order => {
-        const row = tbody.insertRow();
-        row.innerHTML = `
-          <td>${order.order_id}</td>
-          <td>${order.user_id}</td>
-          <td>${order.course_name}</td>
-          <td>${order.final_amount.toLocaleString()}</td>
-        `;
-      });
-    }
-  }
-</script>
+            <div id="admin-users" class="admin-subtab-content bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold text-gray-700">Quản lý Thành viên (Users)</h3>
+                    <button onclick="openAddUserModal()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-500 transition cursor-pointer flex items-center space-x-2">
+                        <i class="fa-solid fa-plus"></i> <span>Thêm thành viên</span>
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead class="bg-gray-100 text-gray-600 uppercase text-xs font-semibold tracking-wider">
+                            <tr>
+                                <th class="p-3">Mã ID</th>
+                                <th class="p-3">Họ và tên</th>
+                                <th class="p-3">Địa chỉ Email</th>
+                                <th class="p-3">Quyền</th>
+                                <th class="p-3">Trạng thái</th>
+                                <th class="p-3 text-right">Xử lý</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblUsers" class="divide-y divide-gray-100 text-gray-700"></tbody>
+                    </table>
+                </div>
+            </div>
 
+            <div id="admin-orders" class="admin-subtab-content bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div class="mb-6">
+                    <h3 class="text-lg font-bold text-gray-700">Quản lý Đơn hàng (Orders) & Duyệt thanh toán</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead class="bg-gray-100 text-gray-600 uppercase text-xs font-semibold tracking-wider">
+                            <tr>
+                                <th class="p-3">Mã đơn hàng</th>
+                                <th class="p-3">User ID</th>
+                                <th class="p-3">Course ID</th>
+                                <th class="p-3">Thành tiền</th>
+                                <th class="p-3">Trạng thái</th>
+                                <th class="p-3">Ngày tạo</th>
+                                <th class="p-3 text-right">Duyệt đơn</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblOrders" class="divide-y divide-gray-100 text-gray-700"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-900 border-t border-slate-800 text-slate-400 py-12 mt-auto">
+         <div class="container mx-auto px-6 grid md:grid-cols-4 gap-8">
+              <div>
+                  <div class="flex items-center space-x-2 text-white font-extrabold text-lg mb-4">
+                       <i class="fa-solid fa-graduation-cap text-indigo-400 text-2xl"></i>
+                       <span>HOANGPRO COURSE</span>
+                  </div>
+                  <p class="text-xs leading-relaxed">Hệ thống đào tạo trực tuyến chất lượng cao, trang bị kiến thức thực chiến vững chắc cho các học viên.</p>
+              </div>
+              <div>
+                  <h4 class="text-white font-bold text-sm mb-4">Danh mục phổ biến</h4>
+                  <ul class="space-y-2 text-xs">
+                      <li><a href="#" onclick="switchTab('homepage-tab')" class="hover:text-indigo-400 transition">Lập trình Web</a></li>
+                      <li><a href="#" onclick="switchTab('homepage-tab')" class="hover:text-indigo-400 transition">Lập trình Di động</a></li>
+                      <li><a href="#" onclick="switchTab('homepage-tab')" class="hover:text-indigo-400 transition">Trí tuệ nhân tạo (AI)</a></li>
+                      <li><a href="#" onclick="switchTab('homepage-tab')" class="hover:text-indigo-400 transition">Thiết kế UI/UX</a></li>
+                  </ul>
+              </div>
+              <div>
+                  <h4 class="text-white font-bold text-sm mb-4">Hỗ trợ thành viên</h4>
+                  <ul class="space-y-2 text-xs">
+                      <li><a href="#" onclick="switchTab('auth-tab')" class="hover:text-indigo-400 transition">Đăng nhập tài khoản</a></li>
+                      <li><a href="#" onclick="switchTab('register-tab')" class="hover:text-indigo-400 transition">Đăng ký thành viên mới</a></li>
+                      <li><a href="#" onclick="loadMyCoursesTab()" class="hover:text-indigo-400 transition">Khóa học của tôi</a></li>
+                      <li><a href="#" onclick="loadUserPaymentHistories()" class="hover:text-indigo-400 transition">Lịch sử thanh toán</a></li>
+                  </ul>
+              </div>
+              <div>
+                  <h4 class="text-white font-bold text-sm mb-4">Liên hệ</h4>
+                  <ul class="space-y-2 text-xs">
+                      <li><i class="fa-solid fa-envelope mr-2"></i> support@hoangpro.com</li>
+                      <li><i class="fa-solid fa-phone mr-2"></i> +84 987 654 321</li>
+                      <li><i class="fa-solid fa-location-dot mr-2"></i> Hà Nội, Việt Nam</li>
+                  </ul>
+              </div>
+         </div>
+         <div class="container mx-auto px-6 border-t border-slate-800/60 mt-8 pt-6 text-center text-[10px]">
+              <p>© 2026 HOANGPRO COURSE. Tôi Yêu cầu hoàn thiện. All rights reserved.</p>
+         </div>
+    </footer>
+
+    <div id="crudModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
+            <div class="bg-slate-800 px-6 py-4 flex justify-between items-center text-white">
+                <h4 id="modalTitle" class="font-bold text-lg">Form dữ liệu động</h4>
+                <button onclick="closeCrudModal()" class="text-gray-300 hover:text-white transition cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-6 max-h-[70vh] overflow-y-auto">
+                <form id="dynamicCrudForm" onsubmit="submitCrudForm(event)" class="space-y-4">
+                    <div id="modalFormInputs"></div>
+                    <div class="flex justify-end space-x-3 border-t pt-4 mt-6">
+                        <button type="button" onclick="closeCrudModal()" class="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 transition cursor-pointer">Hủy bỏ</button>
+                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition cursor-pointer">Lưu hệ thống</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let globalHomepageData = null;
+        let adminDashboardCache = null;
+        let activeAdminSubTab = 'admin-categories';
+        let currentActiveCourseId = null;
+
+        document.addEventListener("DOMContentLoaded", function() {
+            loadHomepageContent();
+            checkAuthHeaderState();
+        });
+
+        function checkAuthHeaderState() {
+            const userStr = localStorage.getItem("currentUser");
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                document.getElementById('auth-header-section').classList.add('hidden');
+                document.getElementById('nav-username').innerText = user.name + " (" + user.role + ")";
+                document.getElementById('user-logout-wrapper').classList.remove('hidden');
+                
+                if (user.role === 'admin') {
+                    document.getElementById('admin-nav-wrapper').classList.remove('hidden');
+                } else {
+                    document.getElementById('admin-nav-wrapper').classList.add('hidden');
+                }
+            } else {
+                document.getElementById('auth-header-section').classList.remove('hidden');
+                document.getElementById('user-logout-wrapper').classList.add('hidden');
+                document.getElementById('admin-nav-wrapper').classList.add('hidden');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("currentUser");
+            checkAuthHeaderState();
+            switchTab('homepage-tab');
+            if(document.getElementById('admin-tab').classList.contains('active')) {
+                switchTab('homepage-tab');
+            }
+            showToast("Đã đăng xuất tài khoản!");
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            
+            // Ẩn hiện ảnh bìa trang web tùy theo tab
+            if (tabId === 'homepage-tab') {
+                document.getElementById('website-cover').classList.remove('hidden');
+            } else {
+                document.getElementById('website-cover').classList.add('hidden');
+            }
+            window.scrollTo(0,0);
+        }
+
+        function switchAdminSubTab(subTabId) {
+            activeAdminSubTab = subTabId;
+            document.querySelectorAll('.admin-subtab-content').forEach(el => el.classList.remove('active-subtab'));
+            document.getElementById(subTabId).classList.add('active-subtab');
+            
+            const btns = document.querySelectorAll('.admin-subtab-btn');
+            btns.forEach(btn => {
+               btn.classList.remove('bg-indigo-50', 'text-indigo-700');
+               btn.classList.add('text-gray-600', 'hover:bg-gray-50');
+            });
+            event.target.classList.add('bg-indigo-50', 'text-indigo-700');
+            event.target.classList.remove('text-gray-600', 'hover:bg-gray-50');
+
+            renderTableData();
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('global-toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3500);
+        }
+
+        // Tải trang nội dung khóa học & danh mục
+        function loadHomepageContent() {
+            google.script.run
+                .withSuccessHandler(function(data) {
+                    globalHomepageData = data;
+                    let catHtml = `<button onclick="filterCoursesByCategory('all')" class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold text-sm transition cursor-pointer">Tất cả</button>`;
+                    data.categories.forEach(cat => {
+                        catHtml += `<button onclick="filterCoursesByCategory('${cat.id}')" class="px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium text-sm transition cursor-pointer">${cat.name}</button>`;
+                    });
+                    document.getElementById('filterCategoryButtons').innerHTML = catHtml;
+                    renderCourses(data.courses);
+                })
+                .withFailureHandler(err => { console.error("Lỗi tải trang chủ:", err); })
+                .getHomepageData();
+        }
+
+        function renderCourses(coursesArray) {
+            let html = '';
+            coursesArray.forEach(c => {
+                html += `
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between">
+                    <div>
+                        <div class="h-48 bg-slate-100 overflow-hidden flex items-center justify-center text-slate-400 font-bold">
+                           [ Khóa học Hình ảnh ]
+                        </div>
+                        <div class="p-5">
+                            <span class="text-[10px] bg-slate-100 text-slate-600 font-bold uppercase px-2.5 py-1 rounded-full tracking-wider">${c.category_name}</span>
+                            <h3 class="font-bold text-slate-800 text-base mt-3 mb-2 h-12 overflow-hidden truncate">${c.title}</h3>
+                            <p class="text-xs text-gray-500 mb-4 line-clamp-2">${c.short_desc || 'Không có mô tả'}</p>
+                            <div class="flex items-center space-x-2 text-xs font-semibold uppercase text-gray-500 mb-4">
+                                <i class="fa-solid fa-chart-line"></i> <span>Cấp độ: ${c.level}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-5 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                        <div>
+                            <p class="text-[10px] text-slate-400 line-through">${Number(c.price).toLocaleString('vi-VN')}đ</p>
+                            <p class="text-base font-extrabold text-emerald-600">${Number(c.sale_price).toLocaleString('vi-VN')}đ</p>
+                        </div>
+                        <button onclick="viewCourseLessons('${c.id}')" class="px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-500 transition cursor-pointer">
+                            <i class="fa-solid fa-book-open"></i> Xem bài học
+                        </button>
+                    </div>
+                </div>`;
+            });
+            document.getElementById('coursesGridList').innerHTML = html || '<p class="col-span-3 text-center py-12 text-gray-400 font-medium">Hiện không có khóa học nào thuộc điều kiện lọc.</p>';
+        }
+
+        function filterCoursesByCategory(catId) {
+            if(!globalHomepageData) return;
+            window.lastSelectedCategory = catId;
+            applySearchAndFilterSort();
+            
+            const btns = document.querySelectorAll('#filterCategoryButtons button');
+            btns.forEach(b => {
+                b.classList.remove('bg-indigo-600', 'text-white');
+                b.classList.add('bg-gray-100', 'hover:bg-gray-200', 'text-gray-600');
+            });
+            event.target.classList.add('bg-indigo-600', 'text-white');
+            event.target.classList.remove('bg-gray-100', 'hover:bg-gray-200', 'text-gray-600');
+        }
+
+        // Sắp xếp dữ liệu thông minh trên trang chủ
+        function triggerSmartSearchFilterSort() {
+             applySearchAndFilterSort();
+        }
+
+        function applySearchAndFilterSort() {
+             if(!globalHomepageData) return;
+             let list = [...globalHomepageData.courses];
+
+             // Lọc theo danh mục đã chọn trước đó
+             const catId = window.lastSelectedCategory || 'all';
+             if(catId !== 'all') {
+                 list = list.filter(c => c.category_id.toString() === catId.toString());
+             }
+
+             // Lọc theo từ khóa thanh tìm kiếm
+             const keyword = document.getElementById('smartSearchInput').value.toLowerCase().trim();
+             if(keyword !== "") {
+                 list = list.filter(c => 
+                     (c.title && c.title.toLowerCase().includes(keyword)) || 
+                     (c.short_desc && c.short_desc.toLowerCase().includes(keyword))
+                 );
+             }
+
+             // Lọc theo phân loại cấp độ
+             const level = document.getElementById('smartFilterLevel').value;
+             if(level !== 'all') {
+                 list = list.filter(c => c.level && c.level.toLowerCase() === level.toLowerCase());
+             }
+             
+             // Sắp xếp dữ liệu thông minh
+             const sortType = document.getElementById('smartSortFieldOrder').value;
+             if(sortType === 'title_asc') {
+                 list.sort((a,b) => a.title.localeCompare(b.title));
+             } else if(sortType === 'title_desc') {
+                 list.sort((a,b) => b.title.localeCompare(a.title));
+             } else if(sortType === 'price_asc') {
+                 list.sort((a,b) => parseFloat(a.sale_price) - parseFloat(b.sale_price));
+             } else if(sortType === 'price_desc') {
+                 list.sort((a,b) => parseFloat(b.sale_price) - parseFloat(a.sale_price));
+             }
+
+             renderCourses(list);
+        }
+
+        // Logic xem khóa học, học thử & kích hoạt mở khóa
+        function viewCourseLessons(courseId) {
+            const userStr = localStorage.getItem("currentUser");
+            if(!userStr) {
+                alert("Bạn cần đăng nhập tài khoản để có thể xem bài giảng hoặc học thử!");
+                switchTab('auth-tab');
+                return;
+            }
+            const user = JSON.parse(userStr);
+            currentActiveCourseId = courseId;
+            
+            const courseObj = globalHomepageData.courses.find(c => c.id === courseId);
+            if(courseObj) {
+                document.getElementById('studyCourseTitle').innerText = courseObj.title;
+                document.getElementById('studyCoursePrice').innerText = Number(courseObj.sale_price).toLocaleString('vi-VN') + ' VNĐ';
+            }
+
+            google.script.run
+                .withSuccessHandler(function(lessons) {
+                    let html = '';
+                    lessons.forEach((l, index) => {
+                        let isLocked = l.is_locked;
+                        
+                        html += `
+                        <div class="p-4 rounded-xl border border-gray-100 bg-white flex justify-between items-center shadow-sm">
+                            <div class="flex items-center space-x-3.5">
+                                <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 font-bold">
+                                    ${l.chapter}.${l.order}
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-700 text-xs">${l.title}</h4>
+                                    <span class="inline-block mt-0.5 px-2 py-0.5 rounded-md bg-slate-50 text-[10px] uppercase font-semibold text-slate-500">${l.type}</span>
+                                    ${index < 2 ? '<span class="inline-block ml-2 px-2 py-0.5 rounded-md bg-amber-50 text-[10px] font-bold text-amber-600 uppercase">Học thử</span>' : ''}
+                                </div>
+                            </div>
+                            <div>
+                                ${isLocked ? 
+                                    '<span class="px-3.5 py-2 rounded-lg bg-slate-100 text-slate-400 font-bold text-xs"><i class="fa-solid fa-lock"></i> Đã khóa</span>' 
+                                : 
+                                    `<button onclick="playLessonContent('${l.content_url}', '${l.type}', '${l.title}')" class="px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs cursor-pointer transition">Xem nội dung</button>`
+                                }
+                            </div>
+                        </div>`;
+                    });
+                    document.getElementById('lessonsContainer').innerHTML = html || '<p class="text-center text-xs py-8 text-slate-400">Chưa có bài học trong khóa học này.</p>';
+                    
+                    document.getElementById('smartSearchInput').parentElement.parentElement.classList.add('hidden');
+                    document.getElementById('filterCategoryButtons').parentElement.classList.add('hidden');
+                    document.getElementById('coursesGridList').classList.add('hidden');
+                    document.getElementById('courseStudySection').classList.remove('hidden');
+                })
+                .getLessonsForUser(courseId, user.id);
+        }
+
+        function playLessonContent(url, type, title) {
+             if (!url) { alert("Nội dung chưa được mở khóa hoặc không khả dụng!"); return; }
+             if (type === 'video') {
+                 let embedUrl = url.replace("watch?v=", "embed/");
+                 alert("Phát Video: " + title + "\nURL: " + embedUrl);
+             } else {
+                 alert("Mở Tài liệu/Quiz: " + title + "\nURL: " + url);
+             }
+        }
+
+        function buyCurrentCourse() {
+            const userStr = localStorage.getItem("currentUser");
+            if(!userStr) { switchTab('auth-tab'); return; }
+            const user = JSON.parse(userStr);
+            
+            google.script.run
+                .withSuccessHandler(function(res) {
+                     if(res.success) {
+                         alert("Khởi tạo đơn hàng thanh toán thành công!\nMã nội dung kích hoạt (Mã đơn hàng/Memo): " + res.memo + "\nSố tiền: " + Number(res.amount).toLocaleString('vi-VN') + " VNĐ\n\n(Quản trị viên Admin sẽ Duyệt hóa đơn của bạn trong bảng điều khiển để kích hoạt khóa học).");
+                         showToast(res.msg);
+                         loadUserPaymentHistories();
+                     } else {
+                         alert(res.msg);
+                     }
+                })
+                .createOrder(user.id, currentActiveCourseId);
+        }
+
+        function backToHome() {
+            document.getElementById('smartSearchInput').parentElement.parentElement.classList.remove('hidden');
+            document.getElementById('filterCategoryButtons').parentElement.classList.remove('hidden');
+            document.getElementById('coursesGridList').classList.remove('hidden');
+            document.getElementById('courseStudySection').classList.add('hidden');
+            currentActiveCourseId = null;
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPassword').value;
+
+            google.script.run
+                .withSuccessHandler(function(response) {
+                    if (response.success) {
+                        showToast("Đăng nhập thành công, chuyển hướng...");
+                        localStorage.setItem("currentUser", JSON.stringify(response.user));
+                        checkAuthHeaderState();
+                        
+                        if (response.user.role === 'admin') {
+                            loadAdminData();
+                        } else {
+                            switchTab('homepage-tab');
+                        }
+                    } else {
+                        alert(response.msg);
+                    }
+                })
+                .withFailureHandler(err => { alert("Lỗi kết nối máy chủ phân quyền!"); console.error(err); })
+                .login(email, pass);
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const phone = document.getElementById('regPhone').value;
+            const pass = document.getElementById('regPassword').value;
+
+            google.script.run
+                .withSuccessHandler(function(response) {
+                    if (response.success) {
+                        showToast("Đăng ký thành công, chuyển hướng...");
+                        localStorage.setItem("currentUser", JSON.stringify(response.user));
+                        checkAuthHeaderState();
+                        switchTab('homepage-tab');
+                    } else {
+                        alert(response.msg);
+                    }
+                })
+                .withFailureHandler(err => { alert("Lỗi kết nối máy chủ đăng ký!"); console.error(err); })
+                .register(name, email, phone, pass);
+        }
+
+        function loadMyCoursesTab() {
+             const userStr = localStorage.getItem("currentUser");
+             if(!userStr) { switchTab('auth-tab'); return; }
+             const user = JSON.parse(userStr);
+             
+             google.script.run
+                 .withSuccessHandler(function(courses) {
+                      let html = '';
+                      courses.forEach(c => {
+                          html += `
+                          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between">
+                              <div>
+                                  <div class="h-48 bg-slate-100 overflow-hidden flex items-center justify-center text-slate-400 font-bold">
+                                     [ Khóa học Hình ảnh ]
+                                  </div>
+                                  <div class="p-5">
+                                      <span class="text-[10px] bg-slate-100 text-slate-600 font-bold uppercase px-2.5 py-1 rounded-full tracking-wider">${c.category_name}</span>
+                                      <h3 class="font-bold text-slate-800 text-base mt-3 mb-2 h-12 overflow-hidden truncate">${c.title}</h3>
+                                      <p class="text-xs text-gray-500 mb-4 line-clamp-2">${c.short_desc || 'Không có mô tả'}</p>
+                                      <div class="flex items-center space-x-2 text-xs font-semibold uppercase text-gray-500 mb-4">
+                                          <i class="fa-solid fa-chart-line"></i> <span>Cấp độ: ${c.level}</span>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="p-5 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                                  <span class="text-[10px] text-emerald-800 font-bold bg-emerald-50 px-2 py-1 rounded-lg">Kích hoạt: ${c.order_date}</span>
+                                  <button onclick="viewCourseLessons('${c.id}')" class="px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-500 transition cursor-pointer">
+                                      <i class="fa-solid fa-book-open"></i> Vào học ngay
+                                  </button>
+                              </div>
+                          </div>`;
+                      });
+                      document.getElementById('myCoursesGridList').innerHTML = html || `<div class="col-span-3 py-16 text-center text-slate-400 font-extrabold text-sm bg-white rounded-3xl border border-slate-100 shadow-sm"><i class="fa-solid fa-triangle-exclamation text-3xl block mb-2 text-amber-500"></i> Hiện tại bạn chưa có khóa học nào đã được kích hoạt thanh toán thành công.</div>`;
+                      switchTab('my-courses-tab');
+                 })
+                 .getUserActiveCourses(user.id);
+        }
+
+        function loadUserPaymentHistories() {
+             const userStr = localStorage.getItem("currentUser");
+             if(!userStr) { switchTab('auth-tab'); return; }
+             const user = JSON.parse(userStr);
+             
+             google.script.run
+                 .withSuccessHandler(function(orders) {
+                      let html = '';
+                      orders.forEach(ord => {
+                           html += `<tr class="border-b hover:bg-slate-50/50">
+                                <td class="p-3 font-extrabold text-indigo-600">${ord.id}</td>
+                                <td class="p-3 font-bold text-slate-700 max-w-xs truncate">${ord.course_title}</td>
+                                <td class="p-3 font-extrabold text-emerald-600">${Number(ord.amount).toLocaleString('vi-VN')}đ</td>
+                                <td class="p-3">
+                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide ${ord.status === 'completed' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}">${ord.status}</span>
+                                </td>
+                                <td class="p-3 text-slate-400 font-semibold">${ord.date}</td>
+                           </tr>`;
+                      });
+                      document.getElementById('tblUserOrders').innerHTML = html || `<tr><td colspan="5" class="p-8 text-center text-slate-400 font-bold">Bạn chưa có lịch sử giao dịch nào.</td></tr>`;
+                      switchTab('payment-history-tab');
+                 })
+                 .getUserHistories(user.id);
+        }
+
+        function loadAdminData() {
+            google.script.run
+                .withSuccessHandler(function(data) {
+                    adminDashboardCache = data;
+                    document.getElementById('m-users').innerText = data.metrics.usersCount;
+                    document.getElementById('m-courses').innerText = data.metrics.coursesCount;
+                    document.getElementById('m-lessons').innerText = data.metrics.lessonsCount;
+                    document.getElementById('m-revenue').innerText = Number(data.metrics.revenue).toLocaleString('vi-VN') + ' VNĐ';
+
+                    switchTab('admin-tab');
+                    renderTableData();
+                })
+                .withFailureHandler(err => { alert("Bạn không có quyền truy cập trang quản trị hệ thống!"); console.error(err); switchTab('homepage-tab'); })
+                .getAdminDashboardData();
+        }
+
+        function triggerSmartFilterSort() {
+            if(!adminDashboardCache) return;
+            const keyword = document.getElementById('smartFilterKeyword').value.toLowerCase();
+            const sortField = document.getElementById('smartSortField').value;
+            const sortOrder = document.getElementById('smartSortOrder').value;
+
+            let targetArray = [];
+            if(activeAdminSubTab === 'admin-categories') targetArray = [...adminDashboardCache.categories];
+            else if(activeAdminSubTab === 'admin-courses') targetArray = [...adminDashboardCache.courses];
+            else if(activeAdminSubTab === 'admin-lessons') targetArray = [...adminDashboardCache.lessons];
+            else if(activeAdminSubTab === 'admin-users') targetArray = [...adminDashboardCache.users];
+            else if(activeAdminSubTab === 'admin-orders') targetArray = [...adminDashboardCache.orders];
+
+            if (keyword.trim() !== "") {
+                targetArray = targetArray.filter(item => { return JSON.stringify(item).toLowerCase().includes(keyword); });
+            }
+
+            if (sortField) {
+                targetArray.sort((a, b) => {
+                    let valA = a[sortField] !== undefined ? a[sortField] : "";
+                    let valB = b[sortField] !== undefined ? b[sortField] : "";
+
+                    if (!isNaN(Number(valA)) && !isNaN(Number(valB))) { valA = Number(valA); valB = Number(valB); } 
+                    else { valA = String(valA).toLowerCase(); valB = String(valB).toLowerCase(); }
+                    return sortOrder === "asc" ? (valA > valB ? 1 : -1) : (valA < valB ? 1 : -1);
+                });
+            }
+            renderFilteredTable(targetArray);
+        }
+
+        function renderTableData() {
+            if(!adminDashboardCache) return;
+            document.getElementById('smartFilterKeyword').value = "";
+            document.getElementById('smartSortField').value = "";
+            
+            if(activeAdminSubTab === 'admin-categories') renderFilteredTable(adminDashboardCache.categories);
+            else if(activeAdminSubTab === 'admin-courses') renderFilteredTable(adminDashboardCache.courses);
+            else if(activeAdminSubTab === 'admin-lessons') renderFilteredTable(adminDashboardCache.lessons);
+            else if(activeAdminSubTab === 'admin-users') renderFilteredTable(adminDashboardCache.users);
+            else if(activeAdminSubTab === 'admin-orders') renderFilteredTable(adminDashboardCache.orders);
+        }
+
+        function renderFilteredTable(dataArray) {
+            let html = '';
+            if(activeAdminSubTab === 'admin-categories') {
+                dataArray.forEach(cat => {
+                    html += `<tr class="border-b hover:bg-gray-50/70">
+                        <td class="p-3 font-semibold text-indigo-600">${cat.id}</td>
+                        <td class="p-3 font-medium">${cat.name}</td>
+                        <td class="p-3 text-gray-400 text-xs">${cat.slug}</td>
+                        <td class="p-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${cat.status === 'active' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}">${cat.status}</span></td>
+                        <td class="p-3 text-gray-500 font-bold">${cat.order}</td>
+                        <td class="p-3 space-x-2 text-right">
+                            <button onclick="openEditCategoryModal('${cat.id}')" class="text-sky-600 hover:text-sky-400 cursor-pointer text-xs font-bold uppercase"><i class="fa-solid fa-pen-to-square"></i> Sửa</button>
+                            <button onclick="deleteCategory('${cat.id}')" class="text-red-600 hover:text-red-400 cursor-pointer text-xs font-bold uppercase"><i class="fa-solid fa-trash-can"></i> Xóa</button>
+                        </td>
+                    </tr>`;
+                });
+                document.getElementById('tblCategories').innerHTML = html || `<tr><td colspan="6" class="p-8 text-center text-gray-400 font-medium">Không tìm thấy bản ghi.</td></tr>`;
+            } 
+            else if(activeAdminSubTab === 'admin-courses') {
+                dataArray.forEach(course => {
+                    html += `<tr class="border-b hover:bg-gray-50/70">
+                        <td class="p-3 font-semibold text-indigo-600">${course.id}</td>
+                        <td class="p-3 font-medium max-w-xs truncate">${course.title}</td>
+                        <td class="p-3 font-medium text-slate-500 text-xs">${course.category_id}</td>
+                        <td class="p-3 text-xs uppercase font-semibold text-gray-500">${course.level}</td>
+                        <td class="p-3 text-emerald-600 font-bold">${Number(course.sale_price).toLocaleString('vi-VN')}đ</td>
+                        <td class="p-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${course.status === 'active' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}">${course.status}</span></td>
+                        <td class="p-3 space-x-2 text-right">
+                            <button onclick="openEditCourseModal('${course.id}')" class="text-sky-600 hover:text-sky-400 cursor-pointer text-xs font-bold uppercase"><i class="fa-solid fa-pen-to-square"></i> Sửa</button>
+                            <button onclick="deleteCourse('${course.id}')" class="text-red-600 hover:text-red-400 cursor-pointer text-xs font-bold uppercase"><i class="fa-solid fa-trash-can"></i> Xóa</button>
+                        </td>
+                    </tr>`;
+                });
+                document.getElementById('tblCourses').innerHTML = html || `<tr><td colspan="7" class="p-8 text-center text-gray-400 font-medium">Không tìm thấy khóa học.</td></tr>`;
+            }
+            else if(activeAdminSubTab === 'admin-lessons') {
+                dataArray.forEach(les => {
+                    html += `<tr class="border-b hover:bg-gray-50/70">
+                        <td class="p-3 font-semibold text-indigo-600">${les.id}</td>
+                        <td class="p-3 text-gray-500 font-medium">${les.course_id}</td>
+                        <td class="p-3 text-gray-500">Chương ${les.chapter}</td>
+                        <td class="p-3 font-medium max-w-xs truncate">${les.title}</td>
+                        <td class="p-3"><span class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold uppercase">${les.type}</span></td>
+                        <td class="p-3 text-gray-500 font-bold">${les.order}</td>
+                        <td class="p-3 space-x-2 text-right">
+                            <button onclick="openEditLessonModal('${les.id}')" class="text-sky-600 hover:text-sky-400 cursor-pointer text-xs font-bold uppercase"><i class="fa-solid fa-pen-to-square"></i> Sửa</button>
+                            <button onclick="deleteLesson('${les.id}')" class="text-red-600 hover:text-red-400 cursor-pointer text-xs font-bold uppercase"><i class="fa-solid fa-trash-can"></i> Xóa</button>
+                        </td>
+                    </tr>`;
+                });
+                document.getElementById('tblLessons').innerHTML = html || `<tr><td colspan="7" class="p-8 text-center text-gray-400 font-medium">Không tìm thấy bài học nào.</td></tr>`;
+            }
+            else if(activeAdminSubTab === 'admin-users') {
+                dataArray.forEach(u => {
+                    html += `<tr class="border-b hover:bg-gray-50/70">
+                        <td class="p-3 font-semibold text-indigo-600">${u.id}</td>
+                        <td class="p-3 font-medium">${u.name}</td>
+                        <td class="p-3 text-gray-500 text-xs">${u.email}</td>
+                        <td class="p-3"><span class="px-2.5 py-1 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold">${u.role}</span></td>
+                        <td class="p-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${u.status === 'active' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}">${u.status}</span></td>
+                        <td class="p-3 space-x-2 text-right">
+                            <button onclick="openEditUserModal('${u.id}')" class="text-sky-600 hover:text-sky-400 cursor-pointer text-xs font-bold uppercase"><i class="fa-solid fa-pen-to-square"></i> Sửa</button>
+                            <button onclick="deleteUser('${u.id}')" class="text-red-600 hover:text-red-400 cursor-pointer text-xs font-bold uppercase"><i class="fa-solid fa-trash-can"></i> Xóa</button>
+                        </td>
+                    </tr>`;
+                });
+                document.getElementById('tblUsers').innerHTML = html || `<tr><td colspan="6" class="p-8 text-center text-gray-400 font-medium">Chưa có thành viên.</td></tr>`;
+            }
+            else if(activeAdminSubTab === 'admin-orders') {
+                dataArray.forEach(ord => {
+                    html += `<tr class="border-b hover:bg-gray-50/70">
+                        <td class="p-3 font-semibold text-indigo-600">${ord.id}</td>
+                        <td class="p-3 text-xs text-gray-500">${ord.user_id}</td>
+                        <td class="p-3 text-xs text-gray-500">${ord.course_id}</td>
+                        <td class="p-3 text-emerald-600 font-bold">${Number(ord.amount).toLocaleString('vi-VN')}đ</td>
+                        <td class="p-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${ord.status === 'completed' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}">${ord.status}</span></td>
+                        <td class="p-3 text-gray-400 text-xs">${ord.date}</td>
+                        <td class="p-3 text-right">
+                            ${ord.status !== 'completed' ? `<button onclick="approveOrder('${ord.id}')" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 text-white font-bold text-xs uppercase hover:bg-emerald-500 transition cursor-pointer">Duyệt đơn</button>` : `<span class="text-xs font-bold text-emerald-600"><i class="fa-solid fa-circle-check"></i> ĐÃ HOÀN TẤT</span>`}
+                        </td>
+                    </tr>`;
+                });
+                document.getElementById('tblOrders').innerHTML = html || `<tr><td colspan="7" class="p-8 text-center text-gray-400 font-medium">Danh sách đơn hàng trống.</td></tr>`;
+            }
+        }
+
+        // Action / CRUD Modals
+        function openAddCategoryModal() {
+            document.getElementById('modalTitle').innerText = 'Thêm danh mục mới';
+            document.getElementById('modalFormInputs').innerHTML = `
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Tên danh mục</label>
+                    <input type="text" id="catName" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                </div>
+                <input type="hidden" id="catId" value="">
+            `;
+            document.getElementById('crudModal').classList.remove('hidden');
+        }
+
+        function openEditCategoryModal(catId) {
+            const cat = adminDashboardCache.categories.find(c => c.id === catId);
+            if(!cat) return;
+            document.getElementById('modalTitle').innerText = 'Cập nhật danh mục: ' + cat.id;
+            document.getElementById('modalFormInputs').innerHTML = `
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Tên danh mục</label>
+                    <input type="text" id="catName" value="${cat.name}" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Slug tùy chỉnh</label>
+                    <input type="text" id="catSlug" value="${cat.slug}" class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Trạng thái</label>
+                    <select id="catStatus" class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                        <option value="active" ${cat.status === 'active' ? 'selected' : ''}>Active</option>
+                        <option value="inactive" ${cat.status !== 'active' ? 'selected' : ''}>Inactive</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Thứ tự sắp xếp</label>
+                    <input type="number" id="catOrder" value="${cat.order || 0}" class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                </div>
+                <input type="hidden" id="catId" value="${cat.id}">
+            `;
+            document.getElementById('crudModal').classList.remove('hidden');
+        }
+
+        function openAddCourseModal() {
+            let catOptions = '';
+            if(adminDashboardCache && adminDashboardCache.categories) {
+                adminDashboardCache.categories.forEach(c => { catOptions += `<option value="${c.id}">${c.name}</option>`; });
+            }
+            document.getElementById('modalTitle').innerText = 'Thêm khóa học mới';
+            document.getElementById('modalFormInputs').innerHTML = `
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Tiêu đề khóa học</label>
+                    <input type="text" id="cTitle" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Thuộc danh mục</label>
+                    <select id="cCategoryId" class="w-full px-4 py-2.5 rounded-xl border border-gray-200">${catOptions}</select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Mô tả ngắn</label>
+                    <textarea id="cShortDesc" class="w-full px-4 py-2.5 rounded-xl border border-gray-200"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Giá gốc</label>
+                        <input type="number" id="cPrice" value="0" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Giá KM</label>
+                        <input type="number" id="cSalePrice" value="0" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Mức độ</label>
+                    <select id="cLevel" class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">URL Ảnh thu nhỏ</label>
+                    <input type="text" id="cThumbnail" class="w-full px-4 py-2.5 rounded-xl border border-gray-200" placeholder="Đường dẫn URL ảnh...">
+                </div>
+                <input type="hidden" id="cId" value="">
+                <input type="hidden" id="cTeacherId" value="admin_root">
+                <input type="hidden" id="cStatus" value="active">
+            `;
+            document.getElementById('crudModal').classList.remove('hidden');
+        }
+
+        function openEditCourseModal(courseId) {
+            const course = adminDashboardCache.courses.find(c => c.id === courseId);
+            if(!course) return;
+            let catOptions = '';
+            if(adminDashboardCache && adminDashboardCache.categories) {
+                adminDashboardCache.categories.forEach(c => { catOptions += `<option value="${c.id}" ${c.id === course.category_id ? 'selected' : ''}>${c.name}</option>`; });
+            }
+            document.getElementById('modalTitle').innerText = 'Cập nhật khóa học: ' + course.id;
+            document.getElementById('modalFormInputs').innerHTML = `
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Tiêu đề khóa học</label>
+                    <input type="text" id="cTitle" value="${course.title}" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Thuộc danh mục</label>
+                    <select id="cCategoryId" class="w-full px-4 py-2.5 rounded-xl border border-gray-200">${catOptions}</select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Mô tả ngắn</label>
+                    <textarea id="cShortDesc" class="w-full px-4 py-2.5 rounded-xl border border-gray-200">${course.short_desc || ''}</textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Giá gốc</label>
+                        <input type="number" id="cPrice" value="${course.price}" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Giá khuyến mãi</label>
+                        <input type="number" id="cSalePrice" value="${course.sale_price}" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Mức độ</label>
+                    <select id="cLevel" class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                        <option value="beginner" ${course.level === 'beginner' ? 'selected' : ''}>Beginner</option>
+                        <option value="intermediate" ${course.level === 'intermediate' ? 'selected' : ''}>Intermediate</option>
+                        <option value="advanced" ${course.level === 'advanced' ? 'selected' : ''}>Advanced</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">URL Ảnh thu nhỏ</label>
+                    <input type="text" id="cThumbnail" value="${course.thumbnail || ''}" class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Trạng thái</label>
+                    <select id="cStatus" class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                        <option value="active" ${course.status === 'active' ? 'selected' : ''}>Active</option>
+                        <option value="inactive" ${course.status !== 'active' ? 'selected' : ''}>Inactive</option>
+                    </select>
+                </div>
+                <input type="hidden" id="cId" value="${course.id}">
+            `;
+            document.getElementById('crudModal').classList.remove('hidden');
+        }
+
+        function openAddUserModal() {
+            document.getElementById('modalTitle').innerText = 'Thêm thành viên mới';
+            document.getElementById('modalFormInputs').innerHTML = `
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Họ và tên</label>
+                    <input type="text" id="uName" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Địa chỉ Email</label>
+                    <input type="email" id="uEmail" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Mật khẩu</label>
+                    <input type="text" id="uPassword" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Phân quyền</label>
+                    <select id="uRole" class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                        <option value="student">Student</option>
+                        <option value="teacher">Teacher</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Trạng thái</label>
+                    <select id="uStatus" class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                        <option value="active">Active</option>
+                        <option value="blocked">Blocked</option>
+                    </select>
+                </div>
+                <input type="hidden" id="uId" value="">
+            `;
+            document.getElementById('crudModal').classList.remove('hidden');
+        }
+
+        function openEditUserModal(userId) {
+            const user = adminDashboardCache.users.find(u => u.id === userId);
+            if(!user) return;
+            document.getElementById('modalTitle').innerText = 'Cập nhật thành viên: ' + user.id;
+            document.getElementById('modalFormInputs').innerHTML = `
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Họ và tên</label>
+                    <input type="text" id="uName" value="${user.name}" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Địa chỉ Email</label>
+                    <input type="email" id="uEmail" value="${user.email}" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Mật khẩu</label>
+                    <input type="text" id="uPassword" value="${user.password}" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Phân quyền</label>
+                    <select id="uRole" class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                        <option value="student" ${user.role === 'student' ? 'selected' : ''}>Student</option>
+                        <option value="teacher" ${user.role === 'teacher' ? 'selected' : ''}>Teacher</option>
+                        <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Trạng thái</label>
+                    <select id="uStatus" class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                        <option value="active" ${user.status === 'active' ? 'selected' : ''}>Active</option>
+                        <option value="blocked" ${user.status === 'blocked' ? 'selected' : ''}>Blocked</option>
+                    </select>
+                </div>
+                <input type="hidden" id="uId" value="${user.id}">
+            `;
+            document.getElementById('crudModal').classList.remove('hidden');
+        }
+
+        function openAddLessonModal() {
+            document.getElementById('modalTitle').innerText = 'Thêm bài giảng mới';
+            document.getElementById('modalFormInputs').innerHTML = `
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Course ID (Thuộc mã khóa học)</label>
+                    <input type="text" id="lCourseId" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200" placeholder="Ví dụ: C01">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Chương số (Chapter)</label>
+                    <input type="number" id="lChapter" value="1" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Tiêu đề bài học</label>
+                    <input type="text" id="lTitle" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Kiểu bài học (Type)</label>
+                    <select id="lType" class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                        <option value="video">Video</option>
+                        <option value="document">Document</option>
+                        <option value="quiz">Quiz</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Nội dung / URL Video Content</label>
+                    <input type="text" id="lContentUrl" class="w-full px-4 py-2.5 rounded-xl border border-gray-200" placeholder="Đường dẫn URL nội dung bài học...">
+                </div>
+                <input type="hidden" id="lId" value="">
+            `;
+            document.getElementById('crudModal').classList.remove('hidden');
+        }
+
+        function openEditLessonModal(lessonId) {
+            const les = adminDashboardCache.lessons.find(l => l.id === lessonId);
+            if(!les) return;
+            document.getElementById('modalTitle').innerText = 'Cập nhật bài học: ' + les.id;
+            document.getElementById('modalFormInputs').innerHTML = `
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Mã khóa học (Course ID)</label>
+                    <input type="text" id="lCourseId" value="${les.course_id}" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Chương số (Chapter)</label>
+                    <input type="number" id="lChapter" value="${les.chapter}" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Tiêu đề bài học</label>
+                    <input type="text" id="lTitle" value="${les.title}" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Kiểu bài học (Type)</label>
+                    <select id="lType" class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                        <option value="video" ${les.type === 'video' ? 'selected' : ''}>Video</option>
+                        <option value="document" ${les.type === 'document' ? 'selected' : ''}>Document</option>
+                        <option value="quiz" ${les.type === 'quiz' ? 'selected' : ''}>Quiz</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">URL nội dung bài học</label>
+                    <input type="text" id="lContentUrl" value="${les.content_url || ''}" class="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                </div>
+                <input type="hidden" id="lId" value="${les.id}">
+            `;
+            document.getElementById('crudModal').classList.remove('hidden');
+        }
+
+        function closeCrudModal() { document.getElementById('crudModal').classList.add('hidden'); }
+
+        function submitCrudForm(event) {
+            event.preventDefault();
+            if (activeAdminSubTab === 'admin-categories') {
+                const obj = {
+                    id: document.getElementById('catId').value,
+                    name: document.getElementById('catName').value,
+                    slug: '',
+                    status: 'active',
+                    order: 0
+                };
+                google.script.run.withSuccessHandler(res => { closeCrudModal(); showToast(res.msg); loadAdminData(); loadHomepageContent(); }).adminSaveCategory(obj);
+            }
+            else if (activeAdminSubTab === 'admin-courses') {
+                const obj = {
+                    id: document.getElementById('cId').value,
+                    title: document.getElementById('cTitle').value,
+                    short_desc: document.getElementById('cShortDesc').value,
+                    detail_desc: '',
+                    price: document.getElementById('cPrice').value,
+                    sale_price: document.getElementById('cSalePrice').value,
+                    level: document.getElementById('cLevel').value,
+                    thumbnail: document.getElementById('cThumbnail').value,
+                    teacher_id: 'admin_root',
+                    status: 'active',
+                    category_id: document.getElementById('cCategoryId').value
+                };
+                google.script.run.withSuccessHandler(res => { closeCrudModal(); showToast(res.msg); loadAdminData(); loadHomepageContent(); }).adminSaveCourse(obj);
+            }
+            else if (activeAdminSubTab === 'admin-users') {
+                const obj = {
+                    id: document.getElementById('uId').value,
+                    name: document.getElementById('uName').value,
+                    email: document.getElementById('uEmail').value,
+                    password: document.getElementById('uPassword').value,
+                    role: document.getElementById('uRole').value,
+                    status: document.getElementById('uStatus').value
+                };
+                google.script.run.withSuccessHandler(res => { closeCrudModal(); showToast(res.msg); loadAdminData(); checkAuthHeaderState(); }).adminSaveUser(obj);
+            }
+            else if (activeAdminSubTab === 'admin-lessons') {
+                const obj = {
+                    id: document.getElementById('lId').value,
+                    course_id: document.getElementById('lCourseId').value,
+                    chapter: document.getElementById('lChapter').value,
+                    title: document.getElementById('lTitle').value,
+                    type: document.getElementById('lType').value,
+                    content_url: document.getElementById('lContentUrl').value,
+                    order: 0
+                };
+                google.script.run.withSuccessHandler(res => { closeCrudModal(); showToast(res.msg); loadAdminData(); }).adminSaveLesson(obj);
+            }
+        }
+
+        function deleteCategory(id) {
+            if(confirm("Bạn có chắc chắn muốn xóa danh mục này không?")) {
+                google.script.run.withSuccessHandler(res => { showToast(res.msg); loadAdminData(); loadHomepageContent(); }).adminDeleteCategory(id);
+            }
+        }
+        function deleteCourse(id) {
+            if(confirm("Xóa khóa học sẽ đồng thời xóa các hóa đơn liên quan. Bạn có chắc không?")) {
+                google.script.run.withSuccessHandler(res => { showToast(res.msg); loadAdminData(); loadHomepageContent(); }).adminDeleteCourse(id);
+            }
+        }
+        function deleteLesson(id) {
+            if(confirm("Bạn muốn xóa vĩnh viễn bài giảng này khỏi khóa học?")) {
+                google.script.run.withSuccessHandler(res => { showToast(res.msg); loadAdminData(); }).adminDeleteLesson(id);
+            }
+        }
+        function deleteUser(id) {
+            if(confirm("Bạn có muốn xóa tài khoản thành viên này không?")) {
+                google.script.run.withSuccessHandler(res => { showToast(res.msg); loadAdminData(); checkAuthHeaderState(); }).adminDeleteUser(id);
+            }
+        }
+        function approveOrder(orderId) {
+             google.script.run.withSuccessHandler(res => { showToast(res.msg); loadAdminData(); }).processPaymentSuccess(orderId);
+        }
+    </script>
 </body>
 </html>
